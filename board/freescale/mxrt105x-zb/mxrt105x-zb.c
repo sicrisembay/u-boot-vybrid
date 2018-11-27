@@ -1,6 +1,6 @@
 /*
- *  (C) Copyright 2017 Emcraft Systems
- *  Dmitry Konyshev <probables@emcraft.com>
+ *  (C) Copyright 2018 Zimplistic Private Limited
+ *  Sicris Rey Embay <sicris@zimplistic.com>
  *
  *  SPDX-License-Identifier:	GPL-2.0+
 */

@@ -1,6 +1,6 @@
 #
-# (C) Copyright 2017 Emcraft Systems
-# Dmitry Konyshev <probables@emcraft.com>
+# (C) Copyright 2017 Zimplistic Private Limited
+# Sicris Rey Embay <sicris@zimplistic.com>
 #
 # SPDX-License-Identifier:	GPL-2.0+
 #
@@ -11,7 +11,7 @@ ccflags-y := -I$(CONFIG_BOARDDIR)/CMSIS/Include -I$(CONFIG_BOARDDIR)/CMSIS/Drive
 	-DCPU_MIMXRT1052DVL6A -DPRINTF_FLOAT_ENABLE=0 -DSCANF_FLOAT_ENABLE=0 \
 	-DPRINTF_ADVANCED_ENABLE=0 -DSCANF_ADVANCED_ENABLE=0 -DEVK_MCIMXRM
 
-obj-y	:= mxrt105x-evk.o	\
+obj-y	:= mxrt105x-zb.o	\
 	./CMSIS/Driver/DriverTemplates/Driver_USART.o	\
 	./CMSIS/Driver/DriverTemplates/Driver_CAN.o	\
 	./CMSIS/Driver/DriverTemplates/Driver_MCI.o	\

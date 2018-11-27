@@ -1,8 +1,8 @@
-if TARGET_MXRT105X_EVK
+if TARGET_MXRT105X_ZB
 
 config SYS_BOARD
 	string
-	default "mxrt105x-evk"
+	default "mxrt105x-zb"
 
 config SYS_VENDOR
 	string
@@ -14,6 +14,6 @@ config SYS_SOC
 
 config SYS_CONFIG_NAME
 	string
-	default "mxrt105x-evk"
+	default "mxrt105x-zb"
 
 endif
