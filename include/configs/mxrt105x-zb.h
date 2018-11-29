@@ -47,7 +47,7 @@
 #define CONFIG_SYS_INIT_SP_ADDR		(0x00000000 + 384 * 1024) /* points to end of OCRAM */
 
 #define CONFIG_BOUNCE_BUFFER
-#define CONFIG_FSL_ESDHC
+/* #define CONFIG_FSL_ESDHC */
 #define CONFIG_FSL_USDHC
 #define CONFIG_SUPPORT_EMMC_BOOT /* eMMC specific */
 
@@ -65,7 +65,7 @@
 
 /* Network */
 
-#define CONFIG_FEC_MXC
+/* #define CONFIG_FEC_MXC */
 #define CONFIG_MII
 
 #define IMX_FEC_BASE			0x402D8000

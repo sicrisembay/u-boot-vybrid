@@ -183,7 +183,7 @@ int board_init(void)
 
 int board_late_init(void)
 {
-	board_eth_init(NULL);
+//	board_eth_init(NULL);
 	return 0;
 }
 
