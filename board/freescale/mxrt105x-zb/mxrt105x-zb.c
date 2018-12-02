@@ -23,6 +23,7 @@ void BOARD_Ethernet_InitPins(void);
 void SDRAM_Init(uint32_t bl,uint32_t cl);
 status_t PHY_Init(ENET_Type *base, uint32_t phyAddr, uint32_t srcClock_Hz);
 
+#if 0
 static void mxrt105x_evk_usb_init(void)
 {
 	/* Enable USB1/2 PLLs and USB clock gate */
@@ -34,6 +35,7 @@ static void mxrt105x_evk_usb_init(void)
 	*(volatile long *)0x401f80c4 = 3;
 	*(volatile long *)0x401f80c8 = 3;
 }
+#endif
 
 int board_early_init_f(void)
 {
@@ -44,7 +46,7 @@ int board_early_init_f(void)
 	CLOCK_SetMux(kCLOCK_UartMux,1);
 	CLOCK_EnableClock(kCLOCK_Lpuart1);
 
-	mxrt105x_evk_usb_init();
+//	mxrt105x_evk_usb_init();
 
 	return 0;
 }

@@ -35,7 +35,7 @@ obj-y	:= mxrt105x-zb.o	\
 	./boards/evkmimrt1050/demo_apps/fat_tool/pin_mux.o	\
 	./boards/evkmimrt1050/demo_apps/fat_tool/board.o	\
 	./boards/evkmimrt1050/demo_apps/fat_tool/clock_config.o \
-	./boards/evkmimrt1050/demo_apps/fat_tool/fsl_sdram.o	\
+	./boards/zb/fsl_sdram.o	\
 	./boards/evkmimrt1050/demo_apps/fat_tool/fsl_phy.o
 
 #	./devices/MIMXRT1052/drivers/fsl_common.o	\

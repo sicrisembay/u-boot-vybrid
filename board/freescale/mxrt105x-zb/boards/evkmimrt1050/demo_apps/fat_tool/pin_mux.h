@@ -23,6 +23,7 @@ void BOARD_InitPins(void);
 void BOARD_I2C_ConfigurePins(void);
 void BOARD_Ethernet_InitPins(void);
 
+void BOARD_SetLedState(uint8_t state);
 #if defined(__cplusplus)
 }
 #endif

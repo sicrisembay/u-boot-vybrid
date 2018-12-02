@@ -11,8 +11,11 @@ processor_version: 0.0.0
 
 #include "fsl_common.h"
 #include "fsl_iomuxc.h"
+#include "fsl_gpio.h"
 #include "pin_mux.h"
 
+#define BOARD_LED_GPIO      GPIO2
+#define BOARD_LED_GPIO_PIN  31U
 /*******************************************************************************
  * Code
  ******************************************************************************/
@@ -36,7 +39,14 @@ BOARD_InitPins:
  *
  *END**************************************************************************/
 void BOARD_InitPins(void) {                                /*!< Function assigned for the core: Cortex-A7[ca7] */
-    CLOCK_EnableClock(kCLOCK_Iomuxc);          /* iomuxc clock (iomuxc_clk_enable): 0x03u */
+	gpio_pin_config_t led_config = {kGPIO_DigitalOutput, 0, kGPIO_NoIntmode};
+
+    CLOCK_EnableClock(kCLOCK_Iomuxc);                      /* iomuxc clock (iomuxc_clk_enable): 0x03u */
+
+    /* Initialize LED IO */
+    IOMUXC_SetPinMux(IOMUXC_GPIO_B1_15_GPIO2_IO31, 0U);
+    IOMUXC_SetPinConfig(IOMUXC_GPIO_B1_15_GPIO2_IO31, 0x10B0u);
+    GPIO_PinInit(BOARD_LED_GPIO, BOARD_LED_GPIO_PIN, &led_config);
 
     IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_12_LPUART1_TX,        /* GPIO_AD_B0_12 is configured as LPUART1_TX */
                      0U);                                    /* Software Input On Field: Input Path is determined by functionality */
@@ -61,7 +71,7 @@ void BOARD_InitPins(void) {                                /*!< Function assigne
                                                  Pull Up / Down Config. Field: 100K Ohm Pull Down
                                                  Hyst. Enable Field: Hysteresis Disabled */
 
-#if 1
+#if 0
     IOMUXC_SetPinMux(IOMUXC_GPIO_SD_B0_00_USDHC1_CMD, 0);
     IOMUXC_SetPinMux(IOMUXC_GPIO_SD_B0_01_USDHC1_CLK, 0);
     IOMUXC_SetPinMux(IOMUXC_GPIO_SD_B0_02_USDHC1_DATA0, 0);
@@ -120,6 +130,16 @@ void BOARD_InitPins(void) {                                /*!< Function assigne
 #endif
 }
 
+void BOARD_SetLedState(uint8_t state)
+{
+	if(state != 0) {
+		GPIO_WritePinOutput(BOARD_LED_GPIO, BOARD_LED_GPIO_PIN, 1U);
+	} else {
+		GPIO_WritePinOutput(BOARD_LED_GPIO, BOARD_LED_GPIO_PIN, 0U);
+	}
+}
+
+
 void BOARD_I2C_ConfigurePins(void)
 {
     /*!< Function assigned for the core: Cortex-M7[ca7] */
@@ -147,7 +167,7 @@ void BOARD_Ethernet_InitPins(void)
 {
     CLOCK_EnableClock(kCLOCK_Iomuxc);          /* iomuxc clock (iomuxc_clk_enable): 0x03u */
     /* Initialize UART1 pins below */
-
+#if 0
     /* Initialize the ENET1 pins below. */
     IOMUXC_SetPinMux(IOMUXC_GPIO_EMC_41_ENET_MDIO, 0);
     IOMUXC_SetPinMux(IOMUXC_GPIO_EMC_40_ENET_MDC, 0);
@@ -203,6 +223,7 @@ void BOARD_Ethernet_InitPins(void)
 
     // set TX clk direction
     IOMUXC_GPR->GPR1 |= 0x20000;  
+#endif
 }
 
 /*******************************************************************************
