@@ -189,10 +189,19 @@
 /* For SPL ends */
 
 /* NAND stuff */
+#if defined(CONFIG_NAND_MXRT1052_SLC)
 #define CONFIG_SYS_MAX_NAND_DEVICE             1
 #define CONFIG_SYS_NAND_BASE                   0x00000000
 #define CONFIG_SYS_NAND_5_ADDR_CYCLE
-/* #define CONFIG_SYS_NAND_ONFI_DETECTION */
+#define CONFIG_SYS_NAND_PAGE_COUNT	           64
+#define CONFIG_SYS_NAND_PAGE_SIZE	           2048
+#define CONFIG_SYS_NAND_OOBSIZE		           64
+#define CONFIG_SYS_NAND_BLOCK_SIZE	           (CONFIG_SYS_NAND_PAGE_COUNT * CONFIG_SYS_NAND_PAGE_SIZE)
+#define CONFIG_SYS_NAND_ECCSIZE		           512
+#define CONFIG_SYS_NAND_ECCBYTES	           14
+#define NAND_LARGE_BLOCK_PAGE_SIZE             0x800
+#define NAND_SMALL_BLOCK_PAGE_SIZE             0x200
+#endif /* #if defined(CONFIG_NAND_MXRT1052_SLC) */
 
 /* MTD partition */
 #define CONFIG_MTD_PARTITIONS

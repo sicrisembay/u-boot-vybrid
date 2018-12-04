@@ -118,6 +118,12 @@ config NAND_ZYNQ
 	  This enables Nand driver support for Nand flash controller
 	  found on Zynq SoC.
 
+config NAND_MXRT1052_SLC
+	bool "Support for MXRT105X SEMC Nand Controller"
+	help
+	  This enables Nand driver support for SEMC SLC Nand flash
+	  controller found in iMXRT1052
+	  
 comment "Generic NAND options"
 
 # Enhance depends when converting drivers to Kconfig which use this config
