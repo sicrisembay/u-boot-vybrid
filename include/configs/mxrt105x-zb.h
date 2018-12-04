@@ -123,6 +123,7 @@
 #define CONFIG_BOOTARGS							\
 	"console=ttyLP0,115200 consoleblank=0 ignore_loglevel "
 
+#if 0
 #define CONFIG_BOOTCOMMAND						\
 	"run mmcboot"
 
@@ -156,7 +157,7 @@
 		" fatwrite mmc 0 ${loadaddr} ${image} ${filesize}\0" \
 	"mmc_update_splash=tftp ${tftpdir}${splash} &&" \
 		" fatwrite mmc 0 ${loadaddr} ${splash} ${filesize}\0"
-
+#endif
 /*
  * Command line configuration.
  */
@@ -186,6 +187,26 @@
 					0x1C0000)
 #endif
 /* For SPL ends */
+
+/* NAND stuff */
+#define CONFIG_SYS_MAX_NAND_DEVICE             1
+#define CONFIG_SYS_NAND_BASE                   0x00000000
+#define CONFIG_SYS_NAND_5_ADDR_CYCLE
+/* #define CONFIG_SYS_NAND_ONFI_DETECTION */
+
+/* MTD partition */
+#define CONFIG_MTD_PARTITIONS
+#define CONFIG_MTD_DEVICE	                   /* needed for mtdparts commands */
+#define MTDIDS_DEFAULT                         "nand0=gpmi-nand"
+#define MTDPARTS_DEFAULT                       "mtdparts=gpmi-nand:" \
+                                               "512k(mx7-bcb),"      \
+                                               "1536k(u-boot1)ro,"   \
+                                               "1536k(u-boot2)ro,"   \
+                                               "512k(u-boot-env),"   \
+                                               "-(ubi)"
+/* environment organization */
+#define CONFIG_ENV_SECT_SIZE                   (128 * 1024)
+#define CONFIG_ENV_OFFSET                      (28 * CONFIG_ENV_SECT_SIZE)
 
 #undef CONFIG_CMD_IMLS
 

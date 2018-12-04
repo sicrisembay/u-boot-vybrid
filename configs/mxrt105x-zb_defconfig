@@ -439,7 +439,7 @@ CONFIG_CMD_FAT=y
 # CONFIG_CMD_FS_GENERIC is not set
 # CONFIG_CMD_FS_UUID is not set
 # CONFIG_CMD_JFFS2 is not set
-# CONFIG_CMD_MTDPARTS is not set
+CONFIG_CMD_MTDPARTS=y
 
 #
 # Debug commands
@@ -447,7 +447,7 @@ CONFIG_CMD_FAT=y
 # CONFIG_CMD_BEDBUG is not set
 # CONFIG_CMD_DIAG is not set
 # CONFIG_CMD_KGDB is not set
-# CONFIG_CMD_UBI is not set
+# CONFIG_CMD_UBI=y
 
 #
 # Partition Types
@@ -608,7 +608,7 @@ CONFIG_DM_MMC=y
 #
 # MTD Support
 #
-# CONFIG_MTD is not set
+CONFIG_MTD=y
 # CONFIG_MTD_NOR_FLASH is not set
 
 #
@@ -619,7 +619,6 @@ CONFIG_DM_MMC=y
 # CONFIG_NAND_PXA3XX is not set
 # CONFIG_NAND_ARASAN is not set
 # CONFIG_NAND_ZYNQ is not set
-
 #
 # Generic NAND options
 #
@@ -818,9 +817,9 @@ CONFIG_SYS_CONSOLE_FG_COL=0xa0
 # File systems
 #
 # CONFIG_FS_CBFS is not set
-CONFIG_FS_FAT=y
-CONFIG_FAT_WRITE=y
-CONFIG_FS_FAT_MAX_CLUSTSIZE=65536
+# CONFIG_FS_FAT is not set
+# CONFIG_FAT_WRITE is not set
+# CONFIG_FS_FAT_MAX_CLUSTSIZE is not set
 # CONFIG_FS_JFFS2 is not set
 # CONFIG_FS_CRAMFS is not set
 
