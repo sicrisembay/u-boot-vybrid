@@ -9,8 +9,8 @@
 /dts-v1/;
 
 / {
-	model = "NXP i.RT1050 EVK";
-	compatible = "nxp,imxrt1050-evk", "nxp,imxrt1050", "Generic DT based system";
+	model = "NXP i.RT1050 Zimplistic Board";
+	compatible = "nxp,imxrt1050-zb", "nxp,imxrt1050", "Generic DT based system";
 
 	#address-cells = <1>;
 	#size-cells = <1>;
@@ -22,8 +22,6 @@
 
 	aliases {
 		serial0 = &lpuart1;
-		mmc0 = &usdhc0;
-		ethernet0 = &fec1;
 	};
 
 	cpus {
@@ -81,35 +79,7 @@
 		#size-cells = <1>;
 		reg = <0x40200000 0x100000>;
 		ranges;
-
-		usdhc0: usdhc@402C0000 {
-			compatible = "fsl,imx7ulp-usdhc";
-			reg = <0x402C0000 0x10000>;
-
-			bus-width = <4>;
-			fsl,tuning-start-tap = <20>;
-			fsl,tuning-step= <2>;
-			status = "disabled";
-		};
-
-		fec1: ethernet@402D8000 {
-			compatible = "fsl,imx6sx-fec", "fsl,imx6q-fec";
-			reg = <0x402D8000 0x4000>;
-
-			fsl,num-tx-queues=<3>;
-			fsl,num-rx-queues=<3>;
-			status = "disabled";
-                };
 	};
-};
-
-&usdhc0 {
-	status = "okay";
-};
-
-&fec1 {
-	status = "okay";
-	phy-mode = "rmii";
 };
 
 &lpuart1 {
