@@ -14,14 +14,13 @@
 #include <fsl_esdhc.h>
 #include <fsl_gpio.h>
 #include <fsl_enet.h>
+#include "boards/zb/pin_mux.h"
+#include "boards/zb/fsl_sdram.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
 void BOARD_BootClockRUN(void);
 void BOARD_InitPins(void);
-void BOARD_Ethernet_InitPins(void);
-void SDRAM_Init(uint32_t bl,uint32_t cl);
-status_t PHY_Init(ENET_Type *base, uint32_t phyAddr, uint32_t srcClock_Hz);
 
 #if 0
 static void mxrt105x_evk_usb_init(void)
@@ -39,13 +38,24 @@ static void mxrt105x_evk_usb_init(void)
 
 int board_early_init_f(void)
 {
+	BOARD_BootClockRUN();
+
+    // Enable all clocks
+    BOARD_WriteU32(0x400FC068,0xffffffff);
+    BOARD_WriteU32(0x400FC06C,0xffffffff);
+    BOARD_WriteU32(0x400FC070,0xffffffff);
+    BOARD_WriteU32(0x400FC074,0xffffffff);
+    BOARD_WriteU32(0x400FC078,0xffffffff);
+    BOARD_WriteU32(0x400FC07C,0xffffffff);
+    BOARD_WriteU32(0x400FC080,0xffffffff);
+
 	/* Init board hardware. */
 	BOARD_InitPins();
-	BOARD_BootClockRUN();
 
 	CLOCK_SetMux(kCLOCK_UartMux,1);
 	CLOCK_EnableClock(kCLOCK_Lpuart1);
 
+	SDRAM_Init();
 //	mxrt105x_evk_usb_init();
 
 	return 0;
@@ -168,7 +178,6 @@ int print_cpuinfo(void)
 int dram_init(void)
 {
 	arch_cpu_init();
-	SDRAM_Init(3, 3);
 	gd->ram_top = PHYS_SDRAM;
 	gd->ram_size = PHYS_SDRAM_SIZE;
 	return 0;
