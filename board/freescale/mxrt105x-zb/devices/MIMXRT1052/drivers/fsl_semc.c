@@ -840,6 +840,7 @@ status_t SEMC_IPCommandNandRead(SEMC_Type *base, uint32_t address, uint8_t *data
     uint8_t dataSize = base->NANDCR0 & SEMC_NANDCR0_PS_MASK;
     uint32_t getData = 0;
     uint16_t ipCmd;
+    uint32_t i = 0;
 
     /* Configure IP command data size. */
     SEMC_ConfigureIPCommand(base, SEMC_IPCOMMANDDATASIZEBYTEMAX);
@@ -851,7 +852,7 @@ status_t SEMC_IPCommandNandRead(SEMC_Type *base, uint32_t address, uint8_t *data
         result = SEMC_SendIPCommand(base, kSEMC_MemType_NAND, address, ipCmd, 0, &getData);
         if (result == kStatus_Success)
         {
-            for (uint32_t i = 0; i < sizeof(getData); i++)
+            for (i = 0; i < sizeof(getData); i++)
             {
                 *data = getData & 0xFFU;
                 getData >>= 8U;
@@ -871,7 +872,7 @@ status_t SEMC_IPCommandNandRead(SEMC_Type *base, uint32_t address, uint8_t *data
         result = SEMC_SendIPCommand(base, kSEMC_MemType_NAND, address, ipCmd, 0, &getData);
         if (result == kStatus_Success)
         {
-            for (uint32_t i = 0; i < sizeof(getData); i++)
+            for (i = 0; i < sizeof(getData); i++)
             {
                 *data = getData & 0xFFU;
                 getData >>= 8U;
@@ -892,6 +893,7 @@ status_t SEMC_IPCommandNorRead(SEMC_Type *base, uint32_t address, uint8_t *data,
     status_t result = kStatus_Success;
     uint8_t dataSize = base->NORCR0 & SEMC_NORCR0_PS_MASK;
     uint32_t getData = 0;
+    uint32_t i = 0;
 
     /* Configure IP command data size. */
     SEMC_ConfigureIPCommand(base, SEMC_IPCOMMANDDATASIZEBYTEMAX);
@@ -901,7 +903,7 @@ status_t SEMC_IPCommandNorRead(SEMC_Type *base, uint32_t address, uint8_t *data,
         result = SEMC_SendIPCommand(base, kSEMC_MemType_NOR, address, kSEMC_NORDBICM_Read, 0, &getData);
         if (result == kStatus_Success)
         {
-            for (uint32_t i = 0; i < sizeof(getData); i++)
+            for (i = 0; i < sizeof(getData); i++)
             {
                 *data = getData & 0xFFU;
                 getData >>= 8U;
@@ -921,7 +923,7 @@ status_t SEMC_IPCommandNorRead(SEMC_Type *base, uint32_t address, uint8_t *data,
         result = SEMC_SendIPCommand(base, kSEMC_MemType_NOR, address, kSEMC_NORDBICM_Read, 0, &getData);
         if (result == kStatus_Success)
         {
-            for (uint32_t i = 0; i < sizeof(getData); i++)
+            for (i = 0; i < sizeof(getData); i++)
             {
                 *data = getData & 0xFFU;
                 getData >>= 8U;

@@ -8,7 +8,7 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
-#if 0
+#if 1
 #define DEBUG
 #endif
 
@@ -33,8 +33,10 @@
 #define CONFIG_SYS_LOAD_ADDR		0x80007fc0
 #define CONFIG_LOADADDR			0x80007fc0
 
-#define PHYS_SDRAM			0x80000000
-#define PHYS_SDRAM_SIZE			(32 * 1024 * 1024)
+#define PHYS_SDRAM                  0x80000000
+#define PHYS_SDRAM_SIZE_MB          (32)
+#define PHYS_SDRAM_SIZE_KB          (PHYS_SDRAM_SIZE_MB * 1024)
+#define PHYS_SDRAM_SIZE             (PHYS_SDRAM_SIZE_KB * 1024)
 
 #define DMAMEM_SZ_ALL			(1 * 1024 * 1024)
 #define DMAMEM_BASE			(PHYS_SDRAM + PHYS_SDRAM_SIZE - \

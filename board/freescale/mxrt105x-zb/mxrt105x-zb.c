@@ -16,6 +16,7 @@
 #include <fsl_enet.h>
 #include "boards/zb/pin_mux.h"
 #include "boards/zb/fsl_sdram.h"
+#include "fsl_semc.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -38,6 +39,8 @@ static void mxrt105x_evk_usb_init(void)
 
 int board_early_init_f(void)
 {
+	semc_config_t config;
+
 	BOARD_BootClockRUN();
 
     // Enable all clocks
@@ -55,7 +58,11 @@ int board_early_init_f(void)
 	CLOCK_SetMux(kCLOCK_UartMux,1);
 	CLOCK_EnableClock(kCLOCK_Lpuart1);
 
-	SDRAM_Init();
+	memset(&config, 0, sizeof(semc_config_t));
+	SEMC_GetDefaultConfig(&config);
+	config.dqsMode = kSEMC_Loopbackdqspad;
+	SEMC_Init(SEMC, &config);
+
 //	mxrt105x_evk_usb_init();
 
 	return 0;
@@ -178,8 +185,15 @@ int print_cpuinfo(void)
 int dram_init(void)
 {
 	arch_cpu_init();
+	SDRAM_Init();
 	gd->ram_top = PHYS_SDRAM;
 	gd->ram_size = PHYS_SDRAM_SIZE;
+
+	/*
+	 * Initialize SEMC NAND before relocation and
+	 * after UART is initialized (ease of debug)
+	 */
+	NAND_Init();
 	return 0;
 }
 
