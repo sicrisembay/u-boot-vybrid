@@ -12,54 +12,31 @@
 #include <nand.h>
 #include <linux/mtd/nand_ecc.h>
 #include <linux/errno.h>
+#include "../../../board/freescale/mxrt105x-zb/boards/zb/fsl_nand.h"
 
-struct mxrt105x_nand_slc_regs {
-	u32 data;
-	u32 addr;
-	u32 cmd;
-	u32 stop;
-	u32 ctrl;
-	u32 cfg;
-	u32 stat;
-	u32 int_stat;
-	u32 ien;
-	u32 isr;
-	u32 icr;
-	u32 tac;
-	u32 tc;
-	u32 ecc;
-	u32 dma_data;
+#define MXRT105X_NAND_DEBUG                     0
+
+#define MXRT105X_ZB_NAND_PAGE_SIZE              2048
+#define MXRT105X_ZB_NAND_OOB_SIZE               64
+#define MXRT105X_NAND_COMMAND_BUFFER_SIZE       32
+
+struct mxrt105x_nand_info {
+    uint32_t cmd_queue_len;
+
+    uint8_t *cmd_buf;
+    uint8_t *data_buf;
+    uint8_t *oob_buf;
+
+    bool spare_only;
+    bool status_request;
+    uint16_t col_addr;
+    uint32_t page_addr;
+    uint8_t status;
 };
 
-/* CFG register */
-#define CFG_CE_LOW		(1 << 5)
-#define CFG_DMA_ECC		(1 << 4) /* Enable DMA ECC bit */
-#define CFG_ECC_EN		(1 << 3) /* ECC enable bit */
-#define CFG_DMA_BURST		(1 << 2) /* DMA burst bit */
-#define CFG_DMA_DIR		(1 << 1) /* DMA write(0)/read(1) bit */
-
-/* CTRL register */
-#define CTRL_SW_RESET		(1 << 2)
-#define CTRL_ECC_CLEAR		(1 << 1) /* Reset ECC bit */
-#define CTRL_DMA_START		(1 << 0) /* Start DMA channel bit */
-
-/* STAT register */
-#define STAT_DMA_FIFO		(1 << 2) /* DMA FIFO has data bit */
-#define STAT_NAND_READY		(1 << 0)
-
-/* INT_STAT register */
-#define INT_STAT_TC		(1 << 1)
-#define INT_STAT_RDY		(1 << 0)
-
-/* TAC register bits, be aware of overflows */
-#define TAC_W_RDY(n)		(max_t(uint32_t, (n), 0xF) << 28)
-#define TAC_W_WIDTH(n)		(max_t(uint32_t, (n), 0xF) << 24)
-#define TAC_W_HOLD(n)		(max_t(uint32_t, (n), 0xF) << 20)
-#define TAC_W_SETUP(n)		(max_t(uint32_t, (n), 0xF) << 16)
-#define TAC_R_RDY(n)		(max_t(uint32_t, (n), 0xF) << 12)
-#define TAC_R_WIDTH(n)		(max_t(uint32_t, (n), 0xF) << 8)
-#define TAC_R_HOLD(n)		(max_t(uint32_t, (n), 0xF) << 4)
-#define TAC_R_SETUP(n)		(max_t(uint32_t, (n), 0xF) << 0)
+static struct mxrt105x_nand_info _nand_info;
+static uint8_t buf_main_oob[MXRT105X_ZB_NAND_PAGE_SIZE + MXRT105X_ZB_NAND_OOB_SIZE];
+static uint8_t buf_cmd[MXRT105X_NAND_COMMAND_BUFFER_SIZE];
 
 /* NAND ECC Layout for small page NAND devices
  * Note: For large page devices, the default layouts are used. */
@@ -76,19 +53,217 @@ static struct nand_ecclayout mxrt105x_nand_oob_16 = {
 
 static void mxrt105x_nand_init(void)
 {
-	/// TODO:
+	NAND_Init();
+}
+
+static void mxrt105x_nand_command(struct mtd_info *mtd, unsigned command,
+				int column, int page_addr)
+{
+	struct nand_chip *nand_chip = mtd_to_nand(mtd);
+	struct mxrt105x_nand_info *nand_info = nand_get_controller_data(nand_chip);
+
+#if(MXRT105X_NAND_DEBUG == 1)
+	debug("mxrt105x_nand_command (cmd = 0x%x, col = 0x%x, page = 0x%x)\n",
+	      command, column, page_addr);
+#endif
+
+	/* Reset command state information */
+	nand_info->status_request = false;
+
+	switch (command) {
+	case NAND_CMD_RESET:
+		NAND_Reset();
+		break;
+
+	case NAND_CMD_STATUS:
+		nand_info->col_addr = 0;
+		nand_info->status_request = true;
+		nand_info->status = NAND_Read_Status();
+		break;
+
+	case NAND_CMD_READ0:
+		nand_info->page_addr = page_addr;
+		nand_info->col_addr = column;
+		nand_info->spare_only = false;
+		break;
+
+	case NAND_CMD_READOOB:
+		nand_info->col_addr = column;
+		nand_info->spare_only = true;
+		command = NAND_CMD_READ0; /* only READ0 is valid */
+		break;
+
+	case NAND_CMD_SEQIN:
+//		if (column >= mtd->writesize) {
+//			/*
+//			 * before sending SEQIN command for partial write,
+//			 * we need read one page out. FSL NFC does not support
+//			 * partial write. It always sends out 512+ecc+512+ecc
+//			 * for large page nand flash. But for small page nand
+//			 * flash, it does support SPARE ONLY operation.
+//			 */
+//			if (host->pagesize_2k) {
+//				/* call ourself to read a page */
+//				mxc_nand_command(mtd, NAND_CMD_READ0, 0,
+//						page_addr);
+//			}
+//
+//			host->col_addr = column - mtd->writesize;
+//			host->spare_only = true;
+//
+//			/* Set program pointer to spare region */
+//			if (!host->pagesize_2k)
+//				send_cmd(host, NAND_CMD_READOOB);
+//		} else {
+//			host->spare_only = false;
+//			host->col_addr = column;
+//
+//			/* Set program pointer to page start */
+//			if (!host->pagesize_2k)
+//				send_cmd(host, NAND_CMD_READ0);
+//		}
+		break;
+
+	case NAND_CMD_PAGEPROG:
+//		send_prog_page(host, 0, host->spare_only);
+//
+//		if (host->pagesize_2k && is_mxc_nfc_1()) {
+//			/* data in 4 areas */
+//			send_prog_page(host, 1, host->spare_only);
+//			send_prog_page(host, 2, host->spare_only);
+//			send_prog_page(host, 3, host->spare_only);
+//		}
+
+		break;
+	case NAND_CMD_READID:
+		nand_info->col_addr = 0;
+		NAND_ReadID(nand_info->data_buf);
+		break;
+
+	case NAND_CMD_ERASE2:
+		break;
+	}
+#if 0
+	/* Write out the command to the device. */
+	send_cmd(host, command);
+
+	/* Write out column address, if necessary */
+	if (column != -1) {
+		/*
+		 * MXC NANDFC can only perform full page+spare or
+		 * spare-only read/write. When the upper layers perform
+		 * a read/write buffer operation, we will use the saved
+		 * column address to index into the full page.
+		 */
+		send_addr(host, 0);
+		if (host->pagesize_2k)
+			/* another col addr cycle for 2k page */
+			send_addr(host, 0);
+	}
+
+	/* Write out page address, if necessary */
+	if (page_addr != -1) {
+		u32 page_mask = nand_chip->pagemask;
+		do {
+			send_addr(host, page_addr & 0xFF);
+			page_addr >>= 8;
+			page_mask >>= 8;
+		} while (page_mask);
+	}
+
+	/* Command post-processing step */
+	switch (command) {
+
+	case NAND_CMD_RESET:
+		break;
+
+	case NAND_CMD_READOOB:
+	case NAND_CMD_READ0:
+		if (host->pagesize_2k) {
+			/* send read confirm command */
+			send_cmd(host, NAND_CMD_READSTART);
+			/* read for each AREA */
+			send_read_page(host, 0, host->spare_only);
+			if (is_mxc_nfc_1()) {
+				send_read_page(host, 1, host->spare_only);
+				send_read_page(host, 2, host->spare_only);
+				send_read_page(host, 3, host->spare_only);
+			}
+		} else {
+			send_read_page(host, 0, host->spare_only);
+		}
+		break;
+
+	case NAND_CMD_READID:
+		host->col_addr = 0;
+		send_read_id(host);
+		break;
+
+	case NAND_CMD_PAGEPROG:
+		break;
+
+	case NAND_CMD_STATUS:
+		break;
+
+	case NAND_CMD_ERASE2:
+		break;
+	}
+#endif
+}
+
+static void mxrt105x_nand_select_chip(struct mtd_info *mtd, int chipnr)
+{
+	/* ZB booard has only 1 nand chip */
+	/// Empty
 }
 
 static void mxrt105x_nand_cmd_ctrl(struct mtd_info *mtd,
 				  int cmd, unsigned int ctrl)
 {
-	/// TODO:
+    struct nand_chip *nand = mtd_to_nand(mtd);
+    struct mxrt105x_nand_info *nand_info = nand_get_controller_data(nand);
+    /*
+     * This should not happen!
+     */
+    if(nand_info->cmd_queue_len >= MXRT105X_NAND_COMMAND_BUFFER_SIZE) {
+    	printf("MXRT105X NAND: Command queue too long\n");
+    }
+    /*
+	 * Every operation begins with a command byte and a series of zero or
+	 * more address bytes. These are distinguished by either the Address
+	 * Latch Enable (ALE) or Command Latch Enable (CLE) signals being
+	 * asserted. When MTD is ready to execute the command, it will
+	 * deasert both latch enables.
+	 */
+    if(ctrl & (NAND_ALE | NAND_CLE)) {
+    	if(cmd != NAND_CMD_NONE) {
+    		nand_info->cmd_buf[nand_info->cmd_queue_len++] = cmd;
+    	}
+    	return;
+    }
+    /*
+     * If control arrives here, MTD has deasserted both the ALE and CLE,
+     * which means it's ready to run an operation. Check if we have any
+     * bytes to send.
+     */
+    if(nand_info->cmd_queue_len == 0) {
+    	return;
+    }
+
+    /*
+     * Compile Command Queue
+     */
+    NAND_ProcessCommand(nand_info->cmd_buf, nand_info->cmd_queue_len);
+
+    /*
+     * Reset the command queue
+     */
+    nand_info->cmd_queue_len = 0;
 }
 
 static int mxrt105x_nand_dev_ready(struct mtd_info *mtd)
 {
-	/// TODO:
-	return 0;
+	return(NAND_IsReady());
 }
 
 #if defined(CONFIG_DMA_MXRT105X)
@@ -152,13 +327,56 @@ static void mxrt105x_dma_read_buf(struct mtd_info *mtd, uint8_t *buf, int len)
 #else
 static void mxrt105x_read_buf(struct mtd_info *mtd, uint8_t *buf, int len)
 {
-	/// TODO:
+	struct nand_chip *nand_chip = mtd_to_nand(mtd);
+	struct mxrt105x_nand_info *nand_info = nand_get_controller_data(nand_chip);
+	uint32_t col = 0;
+	uint8_t *p;
+
+#if(MXRT105X_NAND_DEBUG == 1)
+	debug("mxc_nand_read_buf(col = %d, len = %d)\n", nand_info->col_addr, len);
+#endif
+	col = nand_info->col_addr;
+
+	if(nand_info->spare_only) {
+		p = nand_info->oob_buf;
+	} else {
+		p = nand_info->data_buf;
+	}
+
+	while(len > 0) {
+		*buf = p[col];
+		buf++;
+		col++;
+		len--;
+	}
+
+	/* Update saved column address */
+	nand_info->col_addr = col;
 }
 #endif
 
 static uint8_t mxrt105x_read_byte(struct mtd_info *mtd)
 {
-	/// TODO:
+	struct nand_chip *nand_chip = mtd_to_nand(mtd);
+	struct mxrt105x_nand_info *nand_info = nand_get_controller_data(nand_chip);
+	uint8_t ret = 0;
+
+	/* Check for status request */
+    if (nand_info->status_request) {
+        return(nand_info->status);
+	}
+
+	/* If we are accessing the spare region */
+	if (nand_info->spare_only) {
+		ret = nand_info->oob_buf[nand_info->col_addr];
+	} else {
+        ret = nand_info->data_buf[nand_info->col_addr];
+	}
+
+	/* Update saved column address */
+	nand_info->col_addr++;
+
+	return ret;
 }
 
 #if defined(CONFIG_DMA_MXRT105X)
@@ -217,10 +435,21 @@ int board_nand_init(struct nand_chip *mxrt105x_chip)
 	}
 	dmachan = (unsigned int)ret;
 #endif
+	memset(&_nand_info, 0, sizeof(struct mxrt105x_nand_info));
+	/* Initialize buffers */
+	memset(buf_main_oob, 0, MXRT105X_ZB_NAND_PAGE_SIZE + MXRT105X_ZB_NAND_OOB_SIZE);
+	_nand_info.data_buf = &(buf_main_oob[0]);
+	_nand_info.oob_buf = &(buf_main_oob[MXRT105X_ZB_NAND_PAGE_SIZE]);
+	memset(buf_cmd, 0, MXRT105X_NAND_COMMAND_BUFFER_SIZE);
+	_nand_info.cmd_buf = buf_cmd;
+	_nand_info.cmd_queue_len = 0;
 
-	mxrt105x_chip->cmd_ctrl  = mxrt105x_nand_cmd_ctrl;
+	nand_set_controller_data(mxrt105x_chip, &_nand_info);
+
+	mxrt105x_chip->cmdfunc   = mxrt105x_nand_command;
 	mxrt105x_chip->dev_ready = mxrt105x_nand_dev_ready;
-
+	mxrt105x_chip->select_chip = mxrt105x_nand_select_chip;
+//	mxrt105x_chip->cmd_ctrl  = mxrt105x_nand_cmd_ctrl;
 	/*
 	 * The implementation of these functions is quite common, but
 	 * they MUST be defined, because access to data register

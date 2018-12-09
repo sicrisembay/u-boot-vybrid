@@ -8,9 +8,11 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
-#if 1
+#if 0
 #define DEBUG
 #endif
+
+#define CONFIG_USE_STDINT
 
 #if 0
 #define CONFIG_SYS_ICACHE_OFF
@@ -191,7 +193,6 @@
 /* For SPL ends */
 
 /* NAND stuff */
-#if defined(CONFIG_NAND_MXRT1052_SLC)
 #define CONFIG_SYS_MAX_NAND_DEVICE             1
 #define CONFIG_SYS_NAND_BASE                   0x00000000
 #define CONFIG_SYS_NAND_5_ADDR_CYCLE
@@ -203,7 +204,6 @@
 #define CONFIG_SYS_NAND_ECCBYTES	           14
 #define NAND_LARGE_BLOCK_PAGE_SIZE             0x800
 #define NAND_SMALL_BLOCK_PAGE_SIZE             0x200
-#endif /* #if defined(CONFIG_NAND_MXRT1052_SLC) */
 
 /* MTD partition */
 #define CONFIG_MTD_PARTITIONS

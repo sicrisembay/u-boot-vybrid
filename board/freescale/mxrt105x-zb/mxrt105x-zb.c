@@ -189,11 +189,6 @@ int dram_init(void)
 	gd->ram_top = PHYS_SDRAM;
 	gd->ram_size = PHYS_SDRAM_SIZE;
 
-	/*
-	 * Initialize SEMC NAND before relocation and
-	 * after UART is initialized (ease of debug)
-	 */
-	NAND_Init();
 	return 0;
 }
 
