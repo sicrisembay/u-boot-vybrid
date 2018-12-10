@@ -14,11 +14,12 @@
 
 void NAND_Init(void);
 bool NAND_IsReady(void);
-void NAND_ProcessCommand(uint8_t * cmd_buf, uint32_t cmd_queue_len);
 void NAND_Read_Buf(uint8_t *buf, int len);
 uint8_t NAND_Read_Status(void);
 void NAND_Reset(void);
 void NAND_ReadID(uint8_t *buf);
+void NAND_ReadPageDataOOB(uint32_t pageAddress, uint8_t *buf);
+void NAND_Erase(uint8_t command, int32_t page_addr);
 
 #endif // #ifndef _FSL_NAND_H_
 

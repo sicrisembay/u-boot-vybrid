@@ -16,14 +16,7 @@
 
 #define MXRT105X_NAND_DEBUG                     0
 
-#define MXRT105X_ZB_NAND_PAGE_SIZE              2048
-#define MXRT105X_ZB_NAND_OOB_SIZE               64
-#define MXRT105X_NAND_COMMAND_BUFFER_SIZE       32
-
 struct mxrt105x_nand_info {
-    uint32_t cmd_queue_len;
-
-    uint8_t *cmd_buf;
     uint8_t *data_buf;
     uint8_t *oob_buf;
 
@@ -35,8 +28,7 @@ struct mxrt105x_nand_info {
 };
 
 static struct mxrt105x_nand_info _nand_info;
-static uint8_t buf_main_oob[MXRT105X_ZB_NAND_PAGE_SIZE + MXRT105X_ZB_NAND_OOB_SIZE];
-static uint8_t buf_cmd[MXRT105X_NAND_COMMAND_BUFFER_SIZE];
+static uint8_t buf_main_oob[CONFIG_SYS_NAND_PAGE_SIZE + CONFIG_SYS_NAND_OOBSIZE];
 
 /* NAND ECC Layout for small page NAND devices
  * Note: For large page devices, the default layouts are used. */
@@ -85,12 +77,14 @@ static void mxrt105x_nand_command(struct mtd_info *mtd, unsigned command,
 		nand_info->page_addr = page_addr;
 		nand_info->col_addr = column;
 		nand_info->spare_only = false;
+		NAND_ReadPageDataOOB(page_addr, nand_info->data_buf);
 		break;
 
 	case NAND_CMD_READOOB:
+		nand_info->page_addr = page_addr;
 		nand_info->col_addr = column;
 		nand_info->spare_only = true;
-		command = NAND_CMD_READ0; /* only READ0 is valid */
+		NAND_ReadPageDataOOB(page_addr, nand_info->data_buf);
 		break;
 
 	case NAND_CMD_SEQIN:
@@ -140,7 +134,9 @@ static void mxrt105x_nand_command(struct mtd_info *mtd, unsigned command,
 		NAND_ReadID(nand_info->data_buf);
 		break;
 
+	case NAND_CMD_ERASE1:
 	case NAND_CMD_ERASE2:
+		NAND_Erase(command, page_addr);
 		break;
 	}
 #if 0
@@ -215,50 +211,6 @@ static void mxrt105x_nand_select_chip(struct mtd_info *mtd, int chipnr)
 {
 	/* ZB booard has only 1 nand chip */
 	/// Empty
-}
-
-static void mxrt105x_nand_cmd_ctrl(struct mtd_info *mtd,
-				  int cmd, unsigned int ctrl)
-{
-    struct nand_chip *nand = mtd_to_nand(mtd);
-    struct mxrt105x_nand_info *nand_info = nand_get_controller_data(nand);
-    /*
-     * This should not happen!
-     */
-    if(nand_info->cmd_queue_len >= MXRT105X_NAND_COMMAND_BUFFER_SIZE) {
-    	printf("MXRT105X NAND: Command queue too long\n");
-    }
-    /*
-	 * Every operation begins with a command byte and a series of zero or
-	 * more address bytes. These are distinguished by either the Address
-	 * Latch Enable (ALE) or Command Latch Enable (CLE) signals being
-	 * asserted. When MTD is ready to execute the command, it will
-	 * deasert both latch enables.
-	 */
-    if(ctrl & (NAND_ALE | NAND_CLE)) {
-    	if(cmd != NAND_CMD_NONE) {
-    		nand_info->cmd_buf[nand_info->cmd_queue_len++] = cmd;
-    	}
-    	return;
-    }
-    /*
-     * If control arrives here, MTD has deasserted both the ALE and CLE,
-     * which means it's ready to run an operation. Check if we have any
-     * bytes to send.
-     */
-    if(nand_info->cmd_queue_len == 0) {
-    	return;
-    }
-
-    /*
-     * Compile Command Queue
-     */
-    NAND_ProcessCommand(nand_info->cmd_buf, nand_info->cmd_queue_len);
-
-    /*
-     * Reset the command queue
-     */
-    nand_info->cmd_queue_len = 0;
 }
 
 static int mxrt105x_nand_dev_ready(struct mtd_info *mtd)
@@ -437,19 +389,16 @@ int board_nand_init(struct nand_chip *mxrt105x_chip)
 #endif
 	memset(&_nand_info, 0, sizeof(struct mxrt105x_nand_info));
 	/* Initialize buffers */
-	memset(buf_main_oob, 0, MXRT105X_ZB_NAND_PAGE_SIZE + MXRT105X_ZB_NAND_OOB_SIZE);
+	memset(buf_main_oob, 0, CONFIG_SYS_NAND_PAGE_SIZE + CONFIG_SYS_NAND_OOBSIZE);
 	_nand_info.data_buf = &(buf_main_oob[0]);
-	_nand_info.oob_buf = &(buf_main_oob[MXRT105X_ZB_NAND_PAGE_SIZE]);
-	memset(buf_cmd, 0, MXRT105X_NAND_COMMAND_BUFFER_SIZE);
-	_nand_info.cmd_buf = buf_cmd;
-	_nand_info.cmd_queue_len = 0;
+	_nand_info.oob_buf = &(buf_main_oob[CONFIG_SYS_NAND_PAGE_SIZE]);
 
 	nand_set_controller_data(mxrt105x_chip, &_nand_info);
 
 	mxrt105x_chip->cmdfunc   = mxrt105x_nand_command;
 	mxrt105x_chip->dev_ready = mxrt105x_nand_dev_ready;
 	mxrt105x_chip->select_chip = mxrt105x_nand_select_chip;
-//	mxrt105x_chip->cmd_ctrl  = mxrt105x_nand_cmd_ctrl;
+
 	/*
 	 * The implementation of these functions is quite common, but
 	 * they MUST be defined, because access to data register

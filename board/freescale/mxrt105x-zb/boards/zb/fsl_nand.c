@@ -96,47 +96,6 @@ bool NAND_IsReady(void)
 	return(SEMC_IsNandReady(SEMC));
 }
 
-void NAND_ProcessCommand(uint8_t * cmd_buf, uint32_t cmd_queue_len)
-{
-	uint32_t col;
-	uint32_t row;
-	uint32_t address;
-	uint16_t commandCode = 0;
-
-#if(DEBUG_NAND_CONFIG == 1)
-    uint32_t idx;
-    debug("\nNAND_ProcessCommand: Len:%d, Buf:", cmd_queue_len);
-    for(idx = 0; idx < cmd_queue_len; idx++) {
-        debug(" %02X", cmd_buf[idx]);
-    }
-#endif
-
-	if(cmd_queue_len == 0) {
-		return;
-	}
-
-	address = 0;
-    if(cmd_queue_len == 1) {
-        /* Command only */
-        commandCode = SEMC_BuildNandIPCommand(cmd_buf[0], kSEMC_NANDAM_ColumnRow, kSEMC_NANDCM_CommandHold);
-	} else if(cmd_queue_len == 2) {
-        /* Command + 1 Byte Addr */
-        commandCode = SEMC_BuildNandIPCommand(cmd_buf[0], kSEMC_NANDAM_ColumnCA0, kSEMC_NANDCM_CommandAddressHold);
-        address = cmd_buf[1];
-	} else {
-        commandCode = SEMC_BuildNandIPCommand(cmd_buf[0], kSEMC_NANDAM_ColumnRow, kSEMC_NANDCM_CommandAddressHold);
-        col = cmd_buf[1] + (cmd_buf[2] << 8);
-        row = cmd_buf[3] + (cmd_buf[4] << 8) + (cmd_buf[5] << 16);
-        address = col | (row << 12);
-	}
-
-#if(DEBUG_NAND_CONFIG == 1)
-    debug("\nCommandCode:%02X, address:%08X", commandCode, address);
-#endif
-
-	SEMC_SendIPCommand(SEMC, kSEMC_MemType_NAND, address, commandCode, 0, NULL);
-}
-
 void NAND_Read_Buf(uint8_t *buf, int len)
 {
 	SEMC_IPCommandNandRead(SEMC, 0, buf, len);
@@ -194,7 +153,6 @@ void NAND_Reset(void)
 void NAND_ReadID(uint8_t *buf)
 {
     status_t status = kStatus_Success;
-    uint32_t readyCheckIntervalInUs;
     uint32_t dummyData = 0;
     uint32_t slaveAddress;
     uint16_t commandCode;
@@ -232,4 +190,70 @@ void NAND_ReadID(uint8_t *buf)
     }
 }
 
+void NAND_ReadPageDataOOB(uint32_t pageAddress, uint8_t *buf)
+{
+	uint32_t slaveAddress;
+    uint32_t dummyData = 0;
+    uint16_t commandCode;
+    status_t status = kStatus_Success;
 
+
+	while(SEMC_IsNandReady(SEMC) != true);
+
+	/* Load Page to Buffer */
+    commandCode = SEMC_BuildNandIPCommand(
+                    0x00U,
+                    kSEMC_NANDAM_ColumnRow,
+                    kSEMC_NANDCM_CommandAddress);
+    slaveAddress = CONFIG_SYS_NAND_BASE + (pageAddress * CONFIG_SYS_NAND_PAGE_SIZE);
+    status = SEMC_SendIPCommand(SEMC, kSEMC_MemType_NAND, slaveAddress, commandCode, 0, &dummyData);
+    if(status != kStatus_Success) {
+    	printf("fsl_nand, NAND_ReadPageDataOOB, SEMC_SendIPCommand Failed!\n");
+    	return;
+    }
+    commandCode = SEMC_BuildNandIPCommand(
+                    0x30U,
+					kSEMC_NANDAM_ColumnRow,
+					kSEMC_NANDCM_CommandHold);
+    status = SEMC_SendIPCommand(SEMC, kSEMC_MemType_NAND, slaveAddress, commandCode, 0, &dummyData);
+    if(status != kStatus_Success) {
+		printf("fsl_nand, NAND_ReadPageDataOOB, SEMC_SendIPCommand Failed!\n");
+		return;
+	}
+
+    while(SEMC_IsNandReady(SEMC) != true);
+    status = SEMC_IPCommandNandRead(SEMC, slaveAddress, buf, CONFIG_SYS_NAND_PAGE_SIZE + CONFIG_SYS_NAND_OOBSIZE);
+    if(status != kStatus_Success) {
+		printf("fsl_nand, NAND_ReadPageDataOOB, SEMC_SendIPCommand Failed!\n");
+		return;
+	}
+}
+
+void NAND_Erase(uint8_t command, int32_t page_addr)
+{
+	uint16_t commandCode;
+	uint32_t slaveAddress;
+	uint32_t dummyData = 0;
+	status_t status = kStatus_Success;
+
+	if(page_addr >= 0) {
+		commandCode = SEMC_BuildNandIPCommand(
+							command,
+							kSEMC_NANDAM_RawRA0RA1,
+							kSEMC_NANDCM_CommandAddress);
+		slaveAddress = page_addr / CONFIG_SYS_NAND_PAGE_COUNT;  // block
+		slaveAddress = slaveAddress * CONFIG_SYS_NAND_PAGE_COUNT * CONFIG_SYS_NAND_PAGE_SIZE;
+	} else {
+		commandCode = SEMC_BuildNandIPCommand(
+							command,
+							kSEMC_NANDAM_ColumnRow,
+							kSEMC_NANDCM_CommandHold);
+		slaveAddress = CONFIG_SYS_NAND_BASE; // dummy
+	}
+	status = SEMC_SendIPCommand(SEMC, kSEMC_MemType_NAND, slaveAddress, commandCode, 0, &dummyData);
+	if(status != kStatus_Success) {
+		printf("fsl_nand, NAND_Erase, SEMC_SendIPCommand Failed!\n");
+		return;
+	}
+	while(NAND_IsReady() != true);
+}
