@@ -20,6 +20,7 @@ void NAND_Reset(void);
 void NAND_ReadID(uint8_t *buf);
 void NAND_ReadPageDataOOB(uint32_t pageAddress, uint8_t *buf);
 void NAND_Erase(uint8_t command, int32_t page_addr);
+void NAND_ProgramPage(int32_t page_addr, int32_t column, uint32_t len, uint8_t *buf);
 
 #endif // #ifndef _FSL_NAND_H_
 

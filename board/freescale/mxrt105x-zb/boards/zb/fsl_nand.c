@@ -243,6 +243,9 @@ void NAND_Erase(uint8_t command, int32_t page_addr)
 							kSEMC_NANDCM_CommandAddress);
 		slaveAddress = page_addr / CONFIG_SYS_NAND_PAGE_COUNT;  // block
 		slaveAddress = slaveAddress * CONFIG_SYS_NAND_PAGE_COUNT * CONFIG_SYS_NAND_PAGE_SIZE;
+#if(DEBUG_NAND_CONFIG == 1)
+		debug("fsl_nand, NAND_Erase, page_addr:%08X, slaveAddr:%08X\n", page_addr, slaveAddress);
+#endif /* #if(DEBUG_NAND_CONFIG == 1) */
 	} else {
 		commandCode = SEMC_BuildNandIPCommand(
 							command,
@@ -252,8 +255,48 @@ void NAND_Erase(uint8_t command, int32_t page_addr)
 	}
 	status = SEMC_SendIPCommand(SEMC, kSEMC_MemType_NAND, slaveAddress, commandCode, 0, &dummyData);
 	if(status != kStatus_Success) {
-		printf("fsl_nand, NAND_Erase, SEMC_SendIPCommand Failed!\n");
+		printf("fsl_nand, NAND_Erase, SEMC_SendIPCommand Failed! (commandCode:%04X)\n", commandCode);
 		return;
 	}
 	while(NAND_IsReady() != true);
+}
+
+
+void NAND_ProgramPage(int32_t page_addr, int32_t column, uint32_t len, uint8_t *buf)
+{
+	uint32_t slaveAddress;
+    uint32_t dummyData = 0;
+    uint16_t commandCode;
+    status_t status = kStatus_Success;
+
+	if((page_addr < 0) || (column < 0) || (buf == (uint8_t *)0)) {
+		printf("fsl_nand, NAND_ProgramPage, invalid argument page:%d, col:%d, buf:%X\n", page_addr, column, buf);
+		return;
+	}
+
+	while(SEMC_IsNandReady(SEMC) != true);
+
+	commandCode = SEMC_BuildNandIPCommand(
+						0x80,
+						kSEMC_NANDAM_ColumnRow,
+						kSEMC_NANDCM_CommandAddressHold);
+	slaveAddress = ((page_addr * CONFIG_SYS_NAND_PAGE_SIZE) + column) + CONFIG_SYS_NAND_BASE;
+	status = SEMC_SendIPCommand(SEMC, kSEMC_MemType_NAND, slaveAddress, commandCode, 0, &dummyData);
+	if(status != kStatus_Success) {
+		printf("fsl_nand, NAND_ProgramPage, SEMC_SendIPCommand Failed! (commandCode:%04X)\n", commandCode);
+		return;
+	}
+
+	SEMC_IPCommandNandWrite(SEMC, slaveAddress, buf, len);
+
+	commandCode = SEMC_BuildNandIPCommand(
+						0x10,
+						kSEMC_NANDAM_ColumnRow,
+						kSEMC_NANDCM_CommandHold);
+	if(status != kStatus_Success) {
+		printf("fsl_nand, NAND_ProgramPage, SEMC_SendIPCommand Failed! (commandCode:%04X)\n", commandCode);
+		return;
+	}
+
+	while(SEMC_IsNandReady(SEMC) != true);
 }
