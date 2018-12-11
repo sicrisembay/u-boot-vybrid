@@ -74,6 +74,18 @@ static void mxrt105x_nand_command(struct mtd_info *mtd, unsigned command,
 		NAND_ReadPageDataOOB(page_addr, nand_info->data_buf);
 		break;
 
+	case NAND_CMD_RNDOUT:
+		if(column >= mtd->writesize) {
+			/* Page OOB region */
+			nand_info->col_addr = column - mtd->writesize;
+			nand_info->spare_only = true;
+		} else {
+			/* Page Data region */
+			nand_info->spare_only = false;
+			nand_info->col_addr = column;
+		}
+		break;
+
 	case NAND_CMD_SEQIN:
 		// Read Page and OOB
 		nand_info->page_addr = page_addr;
@@ -90,14 +102,10 @@ static void mxrt105x_nand_command(struct mtd_info *mtd, unsigned command,
 		break;
 
 	case NAND_CMD_PAGEPROG:
-		if(nand_info->spare_only) {
-			/* Program Page OOB */
-			NAND_ProgramPage(nand_info->page_addr, mtd->writesize, mtd->oobsize, nand_info->oob_buf);
-		} else {
-			/* Program Page Data */
-			NAND_ProgramPage(nand_info->page_addr, 0, mtd->writesize, nand_info->data_buf);
-		}
+		/* Program Page Data and OOB */
+		NAND_ProgramPage(nand_info->page_addr, 0, mtd->oobsize + mtd->writesize, nand_info->data_buf);
 		break;
+
 	case NAND_CMD_READID:
 		nand_info->col_addr = 0;
 		NAND_ReadID(nand_info->data_buf);
@@ -249,21 +257,15 @@ static void mxrt105x_write_buf(struct mtd_info *mtd, const uint8_t *buf, int len
 	struct nand_chip *nand_chip = mtd_to_nand(mtd);
 	struct mxrt105x_nand_info *nand_info = nand_get_controller_data(nand_chip);
 	int col = 0;
-	uint8_t *p;
 
 #if(MXRT105X_NAND_DEBUG == 1)
 	debug("mxrt105x_write_buf(col = %d, len = %d)\n", nand_info->col_addr, len);
 #endif
 
 	col = nand_info->col_addr;
-	if(nand_info->spare_only) {
-		p = nand_info->oob_buf;
-	} else {
-		p = nand_info->data_buf;
-	}
 
 	while(len > 0) {
-		p[col] = *buf;
+		nand_info->data_buf[col] = *buf;
 		buf++;
 		col++;
 		len--;
@@ -279,12 +281,7 @@ static void mxrt105x_write_byte(struct mtd_info *mtd, uint8_t byte)
 	struct nand_chip *nand_chip = mtd_to_nand(mtd);
 	struct mxrt105x_nand_info *nand_info = nand_get_controller_data(nand_chip);
 
-	/* If we are accessing the spare region */
-	if (nand_info->spare_only) {
-		nand_info->oob_buf[nand_info->col_addr] = byte;
-	} else {
-        nand_info->data_buf[nand_info->col_addr] = byte;
-	}
+	nand_info->data_buf[nand_info->col_addr] = byte;
 
 	/* Update saved column address */
 	nand_info->col_addr++;
@@ -343,14 +340,10 @@ int board_nand_init(struct nand_chip *mxrt105x_chip)
 	mxrt105x_chip->cmdfunc   = mxrt105x_nand_command;
 	mxrt105x_chip->dev_ready = mxrt105x_nand_dev_ready;
 	mxrt105x_chip->select_chip = mxrt105x_nand_select_chip;
-
-	/*
-	 * The implementation of these functions is quite common, but
-	 * they MUST be defined, because access to data register
-	 * is strictly 32-bit aligned.
-	 */
 	mxrt105x_chip->read_byte  = mxrt105x_read_byte;
 	mxrt105x_chip->write_byte = mxrt105x_write_byte;
+	mxrt105x_chip->read_buf   = mxrt105x_read_buf;
+	mxrt105x_chip->write_buf  = mxrt105x_write_buf;
 
 #if defined(CONFIG_DMA_MXRT105X)
 	/* Hardware ECC calculation is supported when DMA driver is selected */
@@ -369,25 +362,16 @@ int board_nand_init(struct nand_chip *mxrt105x_chip)
 	mxrt105x_chip->options		|= NAND_NO_SUBPAGE_WRITE;
 #else
 	/*
-	 * Hardware ECC calculation is not supported by the driver,
-	 * because it requires DMA support
+	 * ECC Configuration
 	 */
 	mxrt105x_chip->ecc.mode = NAND_ECC_SOFT;
+	mxrt105x_chip->ecc.size = CONFIG_SYS_NAND_ECCSIZE;
+	//mxrt105x_chip->ecc.bytes = CONFIG_SYS_NAND_ECCBYTES; /* auto assigned to 3bytes when mode is NAND_ECC_SOFT */
+	//mxrt105x_chip->ecc.strength = 1; /* auto assigned to 1 when mode is NAND_ECC_SOFT */
+    mxrt105x_chip->ecc.layout = NULL; /* uses default ecc oob layout assigned on scan_tail */
 
-	/*
-	 * The implementation of these functions is quite common, but
-	 * they MUST be defined, because access to data register
-	 * is strictly 32-bit aligned.
-	 */
-	mxrt105x_chip->read_buf   = mxrt105x_read_buf;
-	mxrt105x_chip->write_buf  = mxrt105x_write_buf;
 #endif
 
-	mxrt105x_chip->ecc.size     = CONFIG_SYS_NAND_ECCSIZE;
-	mxrt105x_chip->ecc.bytes    = CONFIG_SYS_NAND_ECCBYTES;
-	mxrt105x_chip->ecc.strength = 1;
-
-    mxrt105x_chip->ecc.layout = NULL; /* uses default ecc oob layout assigned on scan_tail */
 
 #if defined(CONFIG_SYS_NAND_USE_FLASH_BBT)
 	mxrt105x_chip->bbt_options |= NAND_BBT_USE_FLASH;

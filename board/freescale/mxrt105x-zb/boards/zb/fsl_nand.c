@@ -280,7 +280,7 @@ void NAND_ProgramPage(int32_t page_addr, int32_t column, uint32_t len, uint8_t *
 						0x80,
 						kSEMC_NANDAM_ColumnRow,
 						kSEMC_NANDCM_CommandAddressHold);
-	slaveAddress = ((page_addr * CONFIG_SYS_NAND_PAGE_SIZE) + column) + CONFIG_SYS_NAND_BASE;
+	slaveAddress = (page_addr * CONFIG_SYS_NAND_PAGE_SIZE) + CONFIG_SYS_NAND_BASE;
 	status = SEMC_SendIPCommand(SEMC, kSEMC_MemType_NAND, slaveAddress, commandCode, 0, &dummyData);
 	if(status != kStatus_Success) {
 		printf("fsl_nand, NAND_ProgramPage, SEMC_SendIPCommand Failed! (commandCode:%04X)\n", commandCode);
@@ -293,6 +293,8 @@ void NAND_ProgramPage(int32_t page_addr, int32_t column, uint32_t len, uint8_t *
 						0x10,
 						kSEMC_NANDAM_ColumnRow,
 						kSEMC_NANDCM_CommandHold);
+	status = SEMC_SendIPCommand(SEMC, kSEMC_MemType_NAND, slaveAddress, commandCode, 0, &dummyData);
+
 	if(status != kStatus_Success) {
 		printf("fsl_nand, NAND_ProgramPage, SEMC_SendIPCommand Failed! (commandCode:%04X)\n", commandCode);
 		return;
