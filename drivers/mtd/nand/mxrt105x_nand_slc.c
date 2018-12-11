@@ -30,19 +30,6 @@ struct mxrt105x_nand_info {
 static struct mxrt105x_nand_info _nand_info;
 static uint8_t buf_main_oob[CONFIG_SYS_NAND_PAGE_SIZE + CONFIG_SYS_NAND_OOBSIZE];
 
-/* NAND ECC Layout for small page NAND devices
- * Note: For large page devices, the default layouts are used. */
-static struct nand_ecclayout mxrt105x_nand_oob_16 = {
-	.eccbytes = 6,
-	.eccpos = {10, 11, 12, 13, 14, 15},
-	.oobfree = {
-		{.offset = 0,
-		 . length = 4},
-		{.offset = 6,
-		 . length = 4}
-		}
-};
-
 static void mxrt105x_nand_init(void)
 {
 	NAND_Init();
@@ -331,6 +318,9 @@ static int mxrt105x_write_page_hwecc(struct mtd_info *mtd,
  */
 int board_nand_init(struct nand_chip *mxrt105x_chip)
 {
+	/* Initialize NAND interface */
+	mxrt105x_nand_init();
+
 #if defined(CONFIG_DMA_MXRT105X)
 	int ret;
 
@@ -393,23 +383,15 @@ int board_nand_init(struct nand_chip *mxrt105x_chip)
 	mxrt105x_chip->write_buf  = mxrt105x_write_buf;
 #endif
 
-	/*
-	 * These values are predefined
-	 * for both small and large page NAND flash devices.
-	 */
 	mxrt105x_chip->ecc.size     = CONFIG_SYS_NAND_ECCSIZE;
 	mxrt105x_chip->ecc.bytes    = CONFIG_SYS_NAND_ECCBYTES;
 	mxrt105x_chip->ecc.strength = 1;
 
-	if (CONFIG_SYS_NAND_PAGE_SIZE != NAND_LARGE_BLOCK_PAGE_SIZE)
-		mxrt105x_chip->ecc.layout = &mxrt105x_nand_oob_16;
+    mxrt105x_chip->ecc.layout = NULL; /* uses default ecc oob layout assigned on scan_tail */
 
 #if defined(CONFIG_SYS_NAND_USE_FLASH_BBT)
 	mxrt105x_chip->bbt_options |= NAND_BBT_USE_FLASH;
 #endif
-
-	/* Initialize NAND interface */
-	mxrt105x_nand_init();
 
 	return 0;
 }
