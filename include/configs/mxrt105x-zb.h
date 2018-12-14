@@ -119,7 +119,7 @@
 					+ sizeof(CONFIG_SYS_PROMPT) + 16)
 
 #define CONFIG_SYS_MAXARGS		16
-#define CONFIG_SYS_MALLOC_LEN		(1 * 1024 * 1024)
+#define CONFIG_SYS_MALLOC_LEN		(4 * 1024 * 1024)
 
 #define CONFIG_SYS_MALLOC_F
 #define CONFIG_SYS_MALLOC_F_LEN		(32 * 1024)
@@ -127,41 +127,23 @@
 #define CONFIG_BOOTARGS							\
 	"console=ttyLP0,115200 consoleblank=0 ignore_loglevel "
 
-#if 0
-#define CONFIG_BOOTCOMMAND						\
-	"run mmcboot"
 
+#define CONFIG_BOOTCOMMAND						\
+	"run nandboot"
+#if 0
 #define CONFIG_PREBOOT \
 	"fatload mmc 0 ${loadaddr} ${splash} && bmp display ${loadaddr};" \
 	"fatexec mmc 0 ${ini}"
+#endif
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
-	"videomode=video=ctfb:x:480,y:272,depth:24,pclk:9300000,le:4,"	\
-		"ri:8,up:4,lo:8,hs:41,vs:10,sync:0,vmode:0\0"		\
-	"addip=setenv bootargs ${bootargs} ip=${ipaddr}:${serverip}:"	\
-		"${gatewayip}:${netmask}:${hostname}:eth0:off\0"	\
-	"ethaddr=aa:bb:cc:dd:ee:f0\0" \
-	"serverip=172.17.0.1\0" \
-	"ipaddr=172.17.44.111\0" \
-	"netmask=255.255.0.0\0" \
-	"ini=mxrt105x-evk.ini\0" \
 	"image=rootfs.uImage\0" \
-	"splash=splash-rt1050-series_24.bmp\0" \
 	"uboot=u-boot-dtb.imx\0" \
-	"tftpdir=imxrt105x/\0" \
-	"gui=/crankdemo/gui.sh\0" \
-	"ssh=yes\0" \
-	"mmcboot=fatload mmc 0 ${loadaddr} ${image} && run addip &&"	\
-		" bootm ${loadaddr}\0" \
-	"netboot=tftp ${tftpdir}${image} && run addip; bootm ${loadaddr}\0" \
-	"mmc_update_uboot=tftp ${tftpdir}${uboot} &&" \
-		" setexpr tmp ${filesize} / 0x200 && setexpr tmp ${tmp} + 1 &&"\
-		" mmc write ${loadaddr} 2 ${tmp}\0" \
-	"mmc_update_kernel=tftp ${tftpdir}${image} &&" \
-		" fatwrite mmc 0 ${loadaddr} ${image} ${filesize}\0" \
-	"mmc_update_splash=tftp ${tftpdir}${splash} &&" \
-		" fatwrite mmc 0 ${loadaddr} ${splash} ${filesize}\0"
-#endif
+	"nandboot=ubi part rootfs && " \
+		      "ubifsmount ubi0:fs && " \
+			  "ubifsload 0x00000000 r2_board_led_blinky.bin && " \
+			  "go 0x00000000\0"
+
 /*
  * Command line configuration.
  */
@@ -195,26 +177,31 @@
 /* NAND stuff */
 #define CONFIG_SYS_MAX_NAND_DEVICE             1
 #define CONFIG_SYS_NAND_BASE                   0x00000000
-#define CONFIG_SYS_NAND_5_ADDR_CYCLE
+/* #define CONFIG_SYS_NAND_5_ADDR_CYCLE */
 #define CONFIG_SYS_NAND_PAGE_COUNT	           64
+/* number of main bytes in NAND page */
 #define CONFIG_SYS_NAND_PAGE_SIZE	           2048
+/* number of OOB bytes in NAND page */
 #define CONFIG_SYS_NAND_OOBSIZE		           64
+/* number of bytes in NAND erase-block */
 #define CONFIG_SYS_NAND_BLOCK_SIZE	           (CONFIG_SYS_NAND_PAGE_COUNT * CONFIG_SYS_NAND_PAGE_SIZE)
+/* data bytes per ECC step */
 #define CONFIG_SYS_NAND_ECCSIZE		           512
-#define CONFIG_SYS_NAND_ECCBYTES	           14
-#define NAND_LARGE_BLOCK_PAGE_SIZE             0x800
-#define NAND_SMALL_BLOCK_PAGE_SIZE             0x200
+/* ECC bytes per step */
+#define CONFIG_SYS_NAND_ECCBYTES	           5
 
 /* MTD partition */
 #define CONFIG_MTD_PARTITIONS
 #define CONFIG_MTD_DEVICE	                   /* needed for mtdparts commands */
 #define MTDIDS_DEFAULT                         "nand0=gpmi-nand"
 #define MTDPARTS_DEFAULT                       "mtdparts=gpmi-nand:" \
-                                               "512k(mx7-bcb),"      \
-                                               "1536k(u-boot1)ro,"   \
-                                               "1536k(u-boot2)ro,"   \
-                                               "512k(u-boot-env),"   \
-                                               "-(ubi)"
+                                               "512k(bcb),"          \
+                                               "2m(u-boot1)ro,"      \
+                                               "2m(u-boot1)ro,"      \
+                                               "10m(u-boot-env),"    \
+                                               "-(rootfs)"
+#define CONFIG_ENV_UBI_PART                    "u-boot-env"
+#define CONFIG_ENV_UBI_VOLUME                  "config"
 /* environment organization */
 #define CONFIG_ENV_SECT_SIZE                   (128 * 1024)
 #define CONFIG_ENV_OFFSET                      (28 * CONFIG_ENV_SECT_SIZE)
