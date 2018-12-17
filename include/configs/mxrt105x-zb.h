@@ -53,33 +53,15 @@
 #define CONFIG_BOUNCE_BUFFER
 /* #define CONFIG_FSL_ESDHC */
 #define CONFIG_FSL_USDHC
-#define CONFIG_SUPPORT_EMMC_BOOT /* eMMC specific */
-
-#define CONFIG_CMD_MMC
 
 #define CONFIG_SYS_FSL_ESDHC_ADDR	0x402c0000
 #define CONFIG_SYS_FSL_USDHC_NUM        1
 
-#define CONFIG_CMD_FAT			1
 #define CONFIG_SYS_FSL_ERRATUM_ESDHC135 1
 #define ESDHCI_QUIRK_BROKEN_TIMEOUT_VALUE
 
 /* UART */
 #define LPUART_BASE			LPUART1_RBASE
-
-/* Network */
-
-/* #define CONFIG_FEC_MXC */
-#define CONFIG_MII
-
-#define IMX_FEC_BASE			0x402D8000
-#define CONFIG_FEC_MXC_PHYADDR          0x2
-
-#define CONFIG_FEC_XCV_TYPE             RMII
-#define CONFIG_ETHPRIME                 "FEC"
-#define FEC_QUIRK_ENET_MAC
-
-#define CONFIG_CMD_MII
 
 /* LCD */
 #ifdef CONFIG_VIDEO
@@ -130,11 +112,6 @@
 
 #define CONFIG_BOOTCOMMAND						\
 	"run nandboot"
-#if 0
-#define CONFIG_PREBOOT \
-	"fatload mmc 0 ${loadaddr} ${splash} && bmp display ${loadaddr};" \
-	"fatexec mmc 0 ${ini}"
-#endif
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"image=rootfs.uImage\0" \

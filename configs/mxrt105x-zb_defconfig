@@ -593,8 +593,8 @@ CONFIG_DM_DEV_READ_INLINE=y
 #
 # MMC Host controller Support
 #
-CONFIG_MMC=y
-CONFIG_DM_MMC=y
+CONFIG_MMC=n
+CONFIG_DM_MMC=n
 # CONFIG_DM_MMC_OPS is not set
 # CONFIG_SPL_MMC_TINY is not set
 # CONFIG_MMC_DW is not set
