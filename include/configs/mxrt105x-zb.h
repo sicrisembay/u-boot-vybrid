@@ -36,7 +36,7 @@
 #define CONFIG_LOADADDR			0x80007fc0
 
 #define PHYS_SDRAM                  0x80000000
-#define PHYS_SDRAM_SIZE_MB          (32)
+#define PHYS_SDRAM_SIZE_MB          (16)
 #define PHYS_SDRAM_SIZE_KB          (PHYS_SDRAM_SIZE_MB * 1024)
 #define PHYS_SDRAM_SIZE             (PHYS_SDRAM_SIZE_KB * 1024)
 

@@ -11,7 +11,7 @@
 #include "fsl_semc.h"
 #include "../../../../../include/common.h"
 
-#define DEBUG_SDRAM_CONFIG 1
+#define DEBUG_SDRAM_CONFIG 0
 
 static void MEM_WriteU32(uint32_t addr, uint32_t val)
 {
@@ -132,30 +132,30 @@ void SDRAM_Init(void)
 #endif
 
 #if(DEBUG_SDRAM_CONFIG == 1)
-    debug("\nSEMC Configuration");
-    debug("\n MCR:   %08X", MEM_ReadU32(0x402F0000));
-    debug("\n IOCR:  %08X", MEM_ReadU32(0x402F0004));
-    debug("\n BMCR0: %08X", MEM_ReadU32(0x402F0008));
-    debug("\n BMCR1: %08X", MEM_ReadU32(0x402F000C));
-    debug("\n BR0:   %08X", MEM_ReadU32(0x402F0010));
-    debug("\n BR1:   %08X", MEM_ReadU32(0x402F0014));
-    debug("\n BR2:   %08X", MEM_ReadU32(0x402F0018));
-    debug("\n BR3:   %08X", MEM_ReadU32(0x402F001C));
-    debug("\n BR4:   %08X", MEM_ReadU32(0x402F0020));
-    debug("\n BR5:   %08X", MEM_ReadU32(0x402F0024));
-    debug("\n BR6:   %08X", MEM_ReadU32(0x402F0028));
-    debug("\n BR7:   %08X", MEM_ReadU32(0x402F002C));
-    debug("\n BR8:   %08X", MEM_ReadU32(0x402F0030));
-    debug("\nSDRAM SEMC Configuration");
-    debug("\n ClockFreq: %d", clockFreq);
-    debug("\n SDRAMCR0: %08X", MEM_ReadU32(0x402F0040));
-    debug("\n SDRAMCR1: %08X", MEM_ReadU32(0x402F0044));
-    debug("\n SDRAMCR2: %08X", MEM_ReadU32(0x402F0048));
-    debug("\n SDRAMCR3: %08X", MEM_ReadU32(0x402F004C));
-    debug("\n IPCR0: %08X", MEM_ReadU32(0x402F0090));
-    debug("\n IPCR1: %08X", MEM_ReadU32(0x402F0094));
-    debug("\n IPCR2: %08X", MEM_ReadU32(0x402F0098));
-    debug("\n");
+    printf("\nSEMC Configuration");
+    printf("\n MCR:   %08X", MEM_ReadU32(0x402F0000));
+    printf("\n IOCR:  %08X", MEM_ReadU32(0x402F0004));
+    printf("\n BMCR0: %08X", MEM_ReadU32(0x402F0008));
+    printf("\n BMCR1: %08X", MEM_ReadU32(0x402F000C));
+    printf("\n BR0:   %08X", MEM_ReadU32(0x402F0010));
+    printf("\n BR1:   %08X", MEM_ReadU32(0x402F0014));
+    printf("\n BR2:   %08X", MEM_ReadU32(0x402F0018));
+    printf("\n BR3:   %08X", MEM_ReadU32(0x402F001C));
+    printf("\n BR4:   %08X", MEM_ReadU32(0x402F0020));
+    printf("\n BR5:   %08X", MEM_ReadU32(0x402F0024));
+    printf("\n BR6:   %08X", MEM_ReadU32(0x402F0028));
+    printf("\n BR7:   %08X", MEM_ReadU32(0x402F002C));
+    printf("\n BR8:   %08X", MEM_ReadU32(0x402F0030));
+    printf("\nSDRAM SEMC Configuration");
+    printf("\n ClockFreq: %d", clockFreq);
+    printf("\n SDRAMCR0: %08X", MEM_ReadU32(0x402F0040));
+    printf("\n SDRAMCR1: %08X", MEM_ReadU32(0x402F0044));
+    printf("\n SDRAMCR2: %08X", MEM_ReadU32(0x402F0048));
+    printf("\n SDRAMCR3: %08X", MEM_ReadU32(0x402F004C));
+    printf("\n IPCR0: %08X", MEM_ReadU32(0x402F0090));
+    printf("\n IPCR1: %08X", MEM_ReadU32(0x402F0094));
+    printf("\n IPCR2: %08X", MEM_ReadU32(0x402F0098));
+    printf("\n");
 #endif
 }
 

@@ -64,30 +64,30 @@ void NAND_Init(void)
 #endif
 
 #if(DEBUG_NAND_CONFIG == 1)
-    debug("\nSEMC Configuration");
-    debug("\n MCR:   %08X", BOARD_ReadU32(0x402F0000));
-    debug("\n IOCR:  %08X", BOARD_ReadU32(0x402F0004));
-    debug("\n BMCR0: %08X", BOARD_ReadU32(0x402F0008));
-    debug("\n BMCR1: %08X", BOARD_ReadU32(0x402F000C));
-    debug("\n BR0:   %08X", BOARD_ReadU32(0x402F0010));
-    debug("\n BR1:   %08X", BOARD_ReadU32(0x402F0014));
-    debug("\n BR2:   %08X", BOARD_ReadU32(0x402F0018));
-    debug("\n BR3:   %08X", BOARD_ReadU32(0x402F001C));
-    debug("\n BR4:   %08X", BOARD_ReadU32(0x402F0020));
-    debug("\n BR5:   %08X", BOARD_ReadU32(0x402F0024));
-    debug("\n BR6:   %08X", BOARD_ReadU32(0x402F0028));
-    debug("\n BR7:   %08X", BOARD_ReadU32(0x402F002C));
-    debug("\n BR8:   %08X", BOARD_ReadU32(0x402F0030));
-    debug("\nNAND SEMC Configuration");
-    debug("\n ClockFreq: %d", clockFreq);
-    debug("\n NANDCR0: %08X", BOARD_ReadU32(0x402F0050));
-    debug("\n NANDCR1: %08X", BOARD_ReadU32(0x402F0054));
-    debug("\n NANDCR2: %08X", BOARD_ReadU32(0x402F0058));
-    debug("\n NANDCR3: %08X", BOARD_ReadU32(0x402F005C));
-    debug("\n IPCR0: %08X", BOARD_ReadU32(0x402F0090));
-    debug("\n IPCR1: %08X", BOARD_ReadU32(0x402F0094));
-    debug("\n IPCR2: %08X", BOARD_ReadU32(0x402F0098));
-    debug("\n");
+    printf("\nSEMC Configuration");
+    printf("\n MCR:   %08X", BOARD_ReadU32(0x402F0000));
+    printf("\n IOCR:  %08X", BOARD_ReadU32(0x402F0004));
+    printf("\n BMCR0: %08X", BOARD_ReadU32(0x402F0008));
+    printf("\n BMCR1: %08X", BOARD_ReadU32(0x402F000C));
+    printf("\n BR0:   %08X", BOARD_ReadU32(0x402F0010));
+    printf("\n BR1:   %08X", BOARD_ReadU32(0x402F0014));
+    printf("\n BR2:   %08X", BOARD_ReadU32(0x402F0018));
+    printf("\n BR3:   %08X", BOARD_ReadU32(0x402F001C));
+    printf("\n BR4:   %08X", BOARD_ReadU32(0x402F0020));
+    printf("\n BR5:   %08X", BOARD_ReadU32(0x402F0024));
+    printf("\n BR6:   %08X", BOARD_ReadU32(0x402F0028));
+    printf("\n BR7:   %08X", BOARD_ReadU32(0x402F002C));
+    printf("\n BR8:   %08X", BOARD_ReadU32(0x402F0030));
+    printf("\nNAND SEMC Configuration");
+    printf("\n ClockFreq: %d", clockFreq);
+    printf("\n NANDCR0: %08X", BOARD_ReadU32(0x402F0050));
+    printf("\n NANDCR1: %08X", BOARD_ReadU32(0x402F0054));
+    printf("\n NANDCR2: %08X", BOARD_ReadU32(0x402F0058));
+    printf("\n NANDCR3: %08X", BOARD_ReadU32(0x402F005C));
+    printf("\n IPCR0: %08X", BOARD_ReadU32(0x402F0090));
+    printf("\n IPCR1: %08X", BOARD_ReadU32(0x402F0094));
+    printf("\n IPCR2: %08X", BOARD_ReadU32(0x402F0098));
+    printf("\n");
 #endif
 }
 
@@ -101,9 +101,9 @@ void NAND_Read_Buf(uint8_t *buf, int len)
 	SEMC_IPCommandNandRead(SEMC, 0, buf, len);
 #if(DEBUG_NAND_CONFIG == 1)
 	uint32_t idx;
-	debug("\nNAND_Read_Buf:");
+	printf("\nNAND_Read_Buf:");
 	for(idx = 0; idx < len; idx++) {
-		debug(" %02X", buf[idx]);
+		printf(" %02X", buf[idx]);
 	}
 #endif
 }
@@ -178,11 +178,11 @@ void NAND_ReadID(uint8_t *buf)
     status = SEMC_IPCommandNandRead(SEMC, slaveAddress, buf, 5);
 #if(DEBUG_NAND_CONFIG == 1)
     int idx;
-    debug("NAND Read ID: ");
+    printf("NAND Read ID: ");
     for(idx = 0; idx < 5; idx++) {
-    	debug(" %02X", buf[idx]);
+    	printf(" %02X", buf[idx]);
     }
-    debug("\n");
+    printf("\n");
 #endif
     if (status != kStatus_Success) {
     	printf("fsl_nand, NAND_ReadID, SEMC_SendIPCommand Failed!\n");
@@ -244,7 +244,7 @@ void NAND_Erase(uint8_t command, int32_t page_addr)
 		slaveAddress = page_addr / CONFIG_SYS_NAND_PAGE_COUNT;  // block
 		slaveAddress = slaveAddress * CONFIG_SYS_NAND_PAGE_COUNT * CONFIG_SYS_NAND_PAGE_SIZE;
 #if(DEBUG_NAND_CONFIG == 1)
-		debug("fsl_nand, NAND_Erase, page_addr:%08X, slaveAddr:%08X\n", page_addr, slaveAddress);
+		printf("fsl_nand, NAND_Erase, page_addr:%08X, slaveAddr:%08X\n", page_addr, slaveAddress);
 #endif /* #if(DEBUG_NAND_CONFIG == 1) */
 	} else {
 		commandCode = SEMC_BuildNandIPCommand(
