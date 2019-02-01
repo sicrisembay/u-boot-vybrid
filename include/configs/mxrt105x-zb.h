@@ -175,10 +175,11 @@
                                                "512k(bcb),"          \
                                                "2m(u-boot1)ro,"      \
                                                "2m(u-boot1)ro,"      \
-                                               "10m(u-boot-env),"    \
                                                "-(rootfs)"
-#define CONFIG_ENV_UBI_PART                    "u-boot-env"
-#define CONFIG_ENV_UBI_VOLUME                  "config"
+#define CONFIG_ENV_UBI_PART                    "rootfs"
+#define CONFIG_SYS_REDUNDAND_ENVIRONMENT
+#define CONFIG_ENV_UBI_VOLUME                  "config1"
+#define CONFIG_ENV_UBI_VOLUME_REDUND           "config2"
 /* environment organization */
 #define CONFIG_ENV_SECT_SIZE                   (128 * 1024)
 #define CONFIG_ENV_OFFSET                      (28 * CONFIG_ENV_SECT_SIZE)
