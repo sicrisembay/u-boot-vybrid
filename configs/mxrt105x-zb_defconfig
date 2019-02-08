@@ -452,7 +452,7 @@ CONFIG_CMD_MTDPARTS=y
 #
 # Partition Types
 #
-# CONFIG_PARTITIONS is not set
+CONFIG_PARTITIONS=y
 # CONFIG_MAC_PARTITION is not set
 # CONFIG_DOS_PARTITION is not set
 # CONFIG_ISO_PARTITION is not set
@@ -824,7 +824,7 @@ CONFIG_SYS_CONSOLE_FG_COL=0xa0
 # File systems
 #
 # CONFIG_FS_CBFS is not set
-# CONFIG_FS_FAT is not set
+CONFIG_FS_FAT=y
 # CONFIG_FAT_WRITE is not set
 # CONFIG_FS_FAT_MAX_CLUSTSIZE is not set
 # CONFIG_FS_JFFS2 is not set
