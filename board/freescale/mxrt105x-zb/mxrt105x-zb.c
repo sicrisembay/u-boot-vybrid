@@ -23,8 +23,7 @@ DECLARE_GLOBAL_DATA_PTR;
 void BOARD_BootClockRUN(void);
 void BOARD_InitPins(void);
 
-#if 0
-static void mxrt105x_evk_usb_init(void)
+static void mxrt105x_zb_usb_init(void)
 {
 	/* Enable USB1/2 PLLs and USB clock gate */
 	*(volatile long *)0x400d8010 |= 0x3040;
@@ -35,7 +34,6 @@ static void mxrt105x_evk_usb_init(void)
 	*(volatile long *)0x401f80c4 = 3;
 	*(volatile long *)0x401f80c8 = 3;
 }
-#endif
 
 int board_early_init_f(void)
 {
@@ -63,7 +61,7 @@ int board_early_init_f(void)
 	config.dqsMode = kSEMC_Loopbackdqspad;
 	SEMC_Init(SEMC, &config);
 
-//	mxrt105x_evk_usb_init();
+	mxrt105x_zb_usb_init();
 
 	return 0;
 }

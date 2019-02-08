@@ -36,7 +36,7 @@ void BOARD_InitPins(void) {
     IOMUXC_SetPinConfig(IOMUXC_GPIO_B1_15_GPIO2_IO31, 0x10B0u);
     GPIO_PinInit(BOARD_LED_GPIO, BOARD_LED_GPIO_PIN, &led_config);
 
-    /* Initialize UART IO */
+    /** Initialize UART IO ***********************************************************************/
     IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_12_LPUART1_TX,        /* GPIO_AD_B0_12 is configured as LPUART1_TX */
                      0U);                                    /* Software Input On Field: Input Path is determined by functionality */
     IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_13_LPUART1_RX,        /* GPIO_AD_B0_13 is configured as LPUART1_RX */
@@ -59,6 +59,14 @@ void BOARD_InitPins(void) {
                                                  Pull / Keep Select Field: Keeper
                                                  Pull Up / Down Config. Field: 100K Ohm Pull Down
                                                  Hyst. Enable Field: Hysteresis Disabled */
+
+    /** Initialize USB IO ************************************************************************/
+    IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_01_USB_OTG1_ID, 0U);
+    IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_01_USB_OTG1_ID, 0xB0B0U);
+//    IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_03_USB_OTG1_OC, 0U);
+//    IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_03_USB_OTG1_OC, 0xB0B0U);
+//    IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_01_USB_OTG1_PWR, 0U);
+//    IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_01_USB_OTG1_PWR, 0xB0B0U);
 
     /* Initialize SEMC IO used for SDRAM and NAND Flash */
     // Config IOMUX for sdr

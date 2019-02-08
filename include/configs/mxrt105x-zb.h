@@ -184,6 +184,11 @@
 #define CONFIG_ENV_SECT_SIZE                   (128 * 1024)
 #define CONFIG_ENV_OFFSET                      (28 * CONFIG_ENV_SECT_SIZE)
 
+/* USB */
+#ifdef CONFIG_CMD_USB
+#define CONFIG_EHCI_IS_TDI
+#endif /* #ifdef CONFIG_CMD_USB */
+
 #undef CONFIG_CMD_IMLS
 
 #endif /* __CONFIG_H */

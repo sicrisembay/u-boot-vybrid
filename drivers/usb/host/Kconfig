@@ -165,6 +165,11 @@ config USB_EHCI_GENERIC
 	---help---
 	  Enables support for generic EHCI controller.
 
+config USB_EHCI_MXRT105X
+    bool "Support for MXRT105X on-chip EHCI USB controller"
+    ---help---
+      Enable support for MXRT105X on-chip EHCI USB controller
+
 endif # USB_EHCI_HCD
 
 config USB_OHCI_HCD
