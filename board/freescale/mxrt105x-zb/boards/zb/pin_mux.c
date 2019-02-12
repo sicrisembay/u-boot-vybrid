@@ -29,6 +29,7 @@ uint32_t BOARD_ReadU32(uint32_t addr)
 
 void BOARD_InitPins(void) {
 	gpio_pin_config_t led_config = {kGPIO_DigitalOutput, 0, kGPIO_NoIntmode};
+	gpio_pin_config_t outputHigh_config = {kGPIO_DigitalOutput, 1, kGPIO_NoIntmode};
     CLOCK_EnableClock(kCLOCK_Iomuxc);
 
     /********************* Initialize LED IO *****************************************************/
@@ -62,11 +63,14 @@ void BOARD_InitPins(void) {
 
     /** Initialize USB IO ************************************************************************/
     IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_01_USB_OTG1_ID, 0U);
-    IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_01_USB_OTG1_ID, 0xB0B0U);
+    IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_01_USB_OTG1_ID, 0xF8B0U);
 //    IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_03_USB_OTG1_OC, 0U);
 //    IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_03_USB_OTG1_OC, 0xB0B0U);
-//    IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_01_USB_OTG1_PWR, 0U);
-//    IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_01_USB_OTG1_PWR, 0xB0B0U);
+#define USB_OTG1_PWR_GPIO		GPIO1
+#define USB_OTG1_PWR_GPIO_PIN   17U
+    GPIO_PinInit(USB_OTG1_PWR_GPIO, USB_OTG1_PWR_GPIO_PIN, &outputHigh_config);
+    IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_01_GPIO1_IO17, 0U);
+    IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_01_GPIO1_IO17, 0xB8B0u);
 
     /* Initialize SEMC IO used for SDRAM and NAND Flash */
     // Config IOMUX for sdr

@@ -111,15 +111,50 @@
 
 
 #define CONFIG_BOOTCOMMAND						\
-	"run nandboot"
+	"run bootcond"
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
-	"image=rootfs.uImage\0" \
-	"uboot=u-boot-dtb.imx\0" \
-	"nandboot=ubi part rootfs && " \
-		      "ubifsmount ubi0:fs && " \
-			  "ubifsload 0x00000000 r2_board_led_blinky.bin && " \
-			  "go 0x00000000\0"
+	"ubootFirstRun=true\0" \
+	"initUbiVol=echo ===== mount rootfs partition =====;" \
+	            "ubi part rootfs;" \
+	            "echo ===== creating ubi volumes =====;" \
+	            "if ubi check config1;" \
+	                "then ubi remove config1;" \
+                "fi;" \
+                "if ubi check config2;" \
+                    "then ubi remove config2;" \
+                "fi;" \
+                "if ubi check fs;" \
+                    "then ubi remove fs;" \
+				"fi;" \
+				"ubi create config1 1048576;" \
+	            "ubi create config2 1048576;" \
+	            "ubi create fs;" \
+	            "setenv ubootFirstRun false;" \
+				"saveenv\0" \
+	"bootfile=zpl_script.img\0" \
+	"bootcond=if $ubootFirstRun;" \
+	          "then echo ===== u-boot first run =====;" \
+	               "env default -a;" \
+	               "run initUbiVol;" \
+	          "fi;" \
+              "usb reset;" \
+	          "if fatload usb 0:auto $loadaddr $bootfile;" \
+	              "then echo $bootfile loaded at 0x$loadaddr;" \
+	                  "if imi $loadaddr;" \
+                          "then source $loadaddr;" \
+                          "else echo Invalid Script File Header!;" \
+                      "fi;" \
+                  "else echo $bootfile not Found!;" \
+	          "fi;" \
+	          "usb stop;" \
+	          "echo ===== Running Application =====;" \
+	          "run nandboot\0" \
+    "appfile=/firmware/project_tres.bin\0" \
+	"apploadaddr=0x00000000\0" \
+	"nandboot=ubifsmount ubi0:fs && " \
+			  "ubifsload $apploadaddr $appfile && " \
+			  "go $apploadaddr\0"
 
 /*
  * Command line configuration.
