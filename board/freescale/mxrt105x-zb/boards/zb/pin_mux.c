@@ -13,6 +13,9 @@
 
 #define BOARD_LED_GPIO      GPIO2
 #define BOARD_LED_GPIO_PIN  31U
+
+#define BOARD_PWR_SW_GPIO       GPIO2
+#define BOARD_PWR_SW_GPIO_PIN   11U
 /*******************************************************************************
  * Code
  ******************************************************************************/
@@ -60,6 +63,10 @@ void BOARD_InitPins(void) {
                                                  Pull / Keep Select Field: Keeper
                                                  Pull Up / Down Config. Field: 100K Ohm Pull Down
                                                  Hyst. Enable Field: Hysteresis Disabled */
+    /** Enable Board Voltage Supply **************************************************************/
+    GPIO_PinInit(BOARD_PWR_SW_GPIO, BOARD_PWR_SW_GPIO_PIN, &outputHigh_config);
+    IOMUXC_SetPinMux(IOMUXC_GPIO_B0_11_GPIO2_IO11, 0U);
+    IOMUXC_SetPinConfig(IOMUXC_GPIO_B0_11_GPIO2_IO11, 0xB0U);
 
     /** Initialize USB IO ************************************************************************/
     IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_01_USB_OTG1_ID, 0U);
