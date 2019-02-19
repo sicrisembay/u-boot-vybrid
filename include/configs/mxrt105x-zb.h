@@ -133,28 +133,30 @@
 	            "setenv ubootFirstRun false;" \
 				"saveenv\0" \
 	"bootfile=zpl_script.img\0" \
-	"bootcond=if $ubootFirstRun;" \
+	"bootcond=if \${ubootFirstRun};" \
 	          "then echo ===== u-boot first run =====;" \
 	               "env default -a;" \
 	               "run initUbiVol;" \
 	          "fi;" \
               "usb reset;" \
-	          "if fatload usb 0:auto $loadaddr $bootfile;" \
-	              "then echo $bootfile loaded at 0x$loadaddr;" \
-	                  "if imi $loadaddr;" \
-                          "then source $loadaddr;" \
+	          "if fatload usb 0:auto \${loadaddr} \${bootfile};" \
+	              "then echo \${bootfile} loaded at \${loadaddr};" \
+	                  "if imi \${loadaddr};" \
+                          "then source \${loadaddr};" \
                           "else echo Invalid Script File Header!;" \
                       "fi;" \
-                  "else echo $bootfile not Found!;" \
+                  "else echo \${bootfile} not Found!;" \
 	          "fi;" \
 	          "usb stop;" \
 	          "echo ===== Running Application =====;" \
 	          "run nandboot\0" \
     "appfile=/firmware/project_tres.bin\0" \
-	"apploadaddr=0x00000000\0" \
+	"apploadaddr=0x80000000\0" \
 	"nandboot=ubifsmount ubi0:fs && " \
-			  "ubifsload $apploadaddr $appfile && " \
-			  "go $apploadaddr\0"
+			  "ubifsload \${apploadaddr} \${appfile} && " \
+			  "setexpr jumpAddr \${apploadaddr} + 0x4 && " \
+			  "setexpr jumpAddr *\${jumpAddr} && " \
+			  "go \${jumpAddr}\0"
 
 /*
  * Command line configuration.
