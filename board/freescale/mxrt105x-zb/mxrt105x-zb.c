@@ -41,6 +41,7 @@ int board_early_init_f(void)
 
 	BOARD_BootClockRUN();
 
+#if 0 /* Removed... this is initialized by DCD */
     // Enable all clocks
     BOARD_WriteU32(0x400FC068,0xffffffff);
     BOARD_WriteU32(0x400FC06C,0xffffffff);
@@ -49,18 +50,18 @@ int board_early_init_f(void)
     BOARD_WriteU32(0x400FC078,0xffffffff);
     BOARD_WriteU32(0x400FC07C,0xffffffff);
     BOARD_WriteU32(0x400FC080,0xffffffff);
-
+#endif
 	/* Init board hardware. */
 	BOARD_InitPins();
 
 	CLOCK_SetMux(kCLOCK_UartMux,1);
 	CLOCK_EnableClock(kCLOCK_Lpuart1);
-
+#if 0 /* Done in DCD */
 	memset(&config, 0, sizeof(semc_config_t));
 	SEMC_GetDefaultConfig(&config);
 	config.dqsMode = kSEMC_Loopbackdqspad;
 	SEMC_Init(SEMC, &config);
-
+#endif // #if 0 /* Done in DCD */
 	mxrt105x_zb_usb_init();
 
 	return 0;

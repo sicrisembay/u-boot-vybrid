@@ -15,6 +15,7 @@ Purpose :
 
 
 void Clock_Init() {
+  unsigned int reg;
   // Enable all clocks
   MEM_WriteU32(0x400FC068,0xffffffff);
   MEM_WriteU32(0x400FC06C,0xffffffff);
@@ -32,18 +33,67 @@ void Clock_Init() {
   // Fpll = 24* (22 + A/B) = 533.25Mhz = 533Mhz
   //ANATOP_HW_ANADIG_PLL_528_NUM = 0x00000038;   //A = 56
   //ANATOP_HW_ANADIG_PLL_528_DENOM = 0x00000100; //B = 256 
-  MEM_WriteU32(0x400D8050,0x00000038);
-  MEM_WriteU32(0x400D8060, 0x00000100);
-  MEM_WriteU32(0x400D8030,0x00002001);  //pll2 528 iniate
+//  MEM_WriteU32(0x400D8050,0x00000038);
+//  MEM_WriteU32(0x400D8060, 0x00000100);
+//  MEM_WriteU32(0x400D8030,0x00002001);  //pll2 528 iniate
   //freq=(533.25*18/29)/2
   //with heavy loading, sdram may not support such high(166mhz) frequency since dq7 bit error.
-  //MEM_WriteU32(0x400D8100,0x001e0000); //160mhz--pfd value (no)
-  //MEM_WriteU32(0x400D8100,0x001f0000); //154mhz--pfd value (no)
-  //MEM_WriteU32(0x400D8100,0x00200000); //150mhz--pfd value (no)
-  //MEM_WriteU32(0x400D8100,0x00230000); //137mhz--pfd value (no)
-  MEM_WriteU32(0x400D8100,0x001d0000);  //166mhz --pfd value
-  MEM_WriteU32(0x400FC014,0x00010D40);  //166mhz--select pfd
+//  MEM_WriteU32(0x400D8100,0x001d0000);  //166mhz --pfd value
+//  MEM_WriteU32(0x400FC014,0x00010D40);  //166mhz--select pfd
 
+
+
+  //==== Based from example project init =====
+  // CLOCK_SetMux(kCLOCK_PeriphClk2Mux, 1)
+  MEM_WriteU32(0x400FC014, 0x02018D40);
+  do {
+    reg = MEM_ReadU32(0x400FC048);
+  } while((reg & 0x20) != 0);
+  
+  // CLOCK_InitArmPll
+  MEM_WriteU32(0x400D8000, 0x80012064);
+  do {
+    reg = MEM_ReadU32(0x400D8000);
+  } while((reg & 0x80000000) == 0);
+  MEM_WriteU32(0x400D8000, 0x80002064);
+
+  // CLOCK_InitSysPll
+  MEM_WriteU32(0x400D8030, 0x80012001);
+  do {
+    reg = MEM_ReadU32(0x400D8030);
+  } while((reg & 0x80000000) == 0);
+  MEM_WriteU32(0x400D8030, 0x80002001);
+
+  // CLOCK_InitUsb1Pll
+  MEM_WriteU32(0x400D8010, 0x80013040);
+  do {
+    reg = MEM_ReadU32(0x400D8010);
+  } while((reg & 0x80000000) == 0);
+  MEM_WriteU32(0x400D8010, 0x80003040);
+
+  // ArmDiv
+  MEM_WriteU32(0x400FC010, 0x1);
+  do {
+    reg = MEM_ReadU32(0x400FC048);
+  } while((reg & 0x10000) != 0);
+
+  // AhbDiv
+  MEM_WriteU32(0x400FC014, 0x02018140);
+  do {
+    reg = MEM_ReadU32(0x400FC048);
+  } while((reg & 0x2) != 0);
+
+  // IpgDiv
+  MEM_WriteU32(0x400FC014, 0x02018340);
+//  do {
+//    reg = MEM_ReadU32(0x400FC048);
+//  } while((reg & 0x2) != 0);
+
+  // PrePeriphMux
+  MEM_WriteU32(0x400FC014, 0x00018340);
+  do {
+    reg = MEM_ReadU32(0x400FC048);
+  } while((reg & 0x20) != 0);
   Report("Clock Init Done");
 }
 

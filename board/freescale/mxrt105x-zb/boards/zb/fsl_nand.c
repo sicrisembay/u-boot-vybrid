@@ -12,7 +12,7 @@
 #include "../../../../../include/configs/mxrt105x-zb.h"
 #include "../../../../../include/common.h"
 
-#define DEBUG_NAND_CONFIG  0
+#define DEBUG_NAND_CONFIG  1
 
 #define NAND_SIZE_KB    (131072)
 

@@ -89,8 +89,8 @@ void BOARD_BootClockRUN(void)
     uint32_t val;
 
     /* Boot ROM did initialize the XTAL, here we only sets external XTAL OSC freq */
-//    CLOCK_SetXtalFreq(24000000U);
-//    CLOCK_SetRtcXtalFreq(32768U);
+    CLOCK_SetXtalFreq(24000000U);
+    CLOCK_SetRtcXtalFreq(32768U);
 
     // setup the CLO to CLKO1, CLKO1_DIV=6, sel to AHB_CLK
     CCM->CCOSR = 0xDB;
@@ -103,6 +103,7 @@ void BOARD_BootClockRUN(void)
 
     while (!(DCDC->REG0 & 0x80000000)); // wait for DCDC ok
 
+#if 0 /* Done in DCD */
     // Move PERIPH_CLK OSC24M
     CLOCK_SetMux(kCLOCK_PeriphMux, 0x1);
     //CLOCK_SetMux(kCLOCK_PeriphClk2Mux, 0x1);
@@ -120,14 +121,17 @@ void BOARD_BootClockRUN(void)
     /* Disable unused clock */
     BOARD_BootClockGate();
 
+
     /* Power down all unused PLL */    
     CLOCK_DeinitAudioPll();
     CLOCK_DeinitVideoPll();
     CLOCK_DeinitEnetPll();
     CLOCK_DeinitUsb2Pll();
-
+#endif // #if 0 /* Done in DCD */
     /* Update core clock */
     SystemCoreClockUpdate();
+
+#if 0 /* Done in DCD */
     const clock_usb_pll_config_t g_ccmConfigUsbPll = {.loopDivider = 0U};
     CLOCK_InitUsb1Pll(&g_ccmConfigUsbPll);
     CLOCK_InitUsb1Pfd(kCLOCK_Pfd1, 17);
@@ -135,27 +139,27 @@ void BOARD_BootClockRUN(void)
 
     CCM_ANALOG->PLL_SYS = CCM_ANALOG_PLL_SYS_ENABLE_MASK|CCM_ANALOG_PLL_SYS_DIV_SELECT_MASK;
     while(!(CCM_ANALOG->PLL_SYS & CCM_ANALOG_PLL_SYS_LOCK_MASK));
-    
+
     SEMC_ClockConfig();
 
     /* route clock to anaclk1/1b */
     /*  clock source selection
-            00000 ARM_PLL ¡ª Arm PLL
-            00001 SYS_PLL ¡ª System PLL
-            00010 PFD4 ¡ª ref_pfd4_clk == pll2_pfd0_clk
-            00011 PFD5 ¡ª ref_pfd5_clk == pll2_pfd1_clk
-            00100 PFD6 ¡ª ref_pfd6_clk == pll2_pfd2_clk
-            00101 PFD7 ¡ª ref_pfd7_clk == pll2_pfd3_clk
-            00110 AUDIO_PLL ¡ª Audio PLL
-            00111 VIDEO_PLL ¡ª Video PLL
-            01001 ETHERNET_REF ¡ª ethernet ref clock (ENET_PLL)
-            01100 USB1_PLL ¡ª USB1 PLL clock
-            01101 USB2_PLL ¡ª USB2 PLL clock
-            01110 PFD0 ¡ª ref_pfd0_clk == pll3_pfd0_clk
-            01111 PFD1 ¡ª ref_pfd1_clk == pll3_pfd1_clk
-            10000 PFD2 ¡ª ref_pfd2_clk == pll3_pfd2_clk
-            10001 PFD3 ¡ª ref_pfd3_clk == pll3_pfd3_clk
-            10010 XTAL ¡ª xtal (24M)
+            00000 ARM_PLL ï¿½ï¿½ Arm PLL
+            00001 SYS_PLL ï¿½ï¿½ System PLL
+            00010 PFD4 ï¿½ï¿½ ref_pfd4_clk == pll2_pfd0_clk
+            00011 PFD5 ï¿½ï¿½ ref_pfd5_clk == pll2_pfd1_clk
+            00100 PFD6 ï¿½ï¿½ ref_pfd6_clk == pll2_pfd2_clk
+            00101 PFD7 ï¿½ï¿½ ref_pfd7_clk == pll2_pfd3_clk
+            00110 AUDIO_PLL ï¿½ï¿½ Audio PLL
+            00111 VIDEO_PLL ï¿½ï¿½ Video PLL
+            01001 ETHERNET_REF ï¿½ï¿½ ethernet ref clock (ENET_PLL)
+            01100 USB1_PLL ï¿½ï¿½ USB1 PLL clock
+            01101 USB2_PLL ï¿½ï¿½ USB2 PLL clock
+            01110 PFD0 ï¿½ï¿½ ref_pfd0_clk == pll3_pfd0_clk
+            01111 PFD1 ï¿½ï¿½ ref_pfd1_clk == pll3_pfd1_clk
+            10000 PFD2 ï¿½ï¿½ ref_pfd2_clk == pll3_pfd2_clk
+            10001 PFD3 ï¿½ï¿½ ref_pfd3_clk == pll3_pfd3_clk
+            10010 XTAL ï¿½ï¿½ xtal (24M)
             10101 to 11111 ref_pfd7_clk == pll2_pfd3_clk
     */
     CCM_ANALOG->MISC1 &= ~CCM_ANALOG_MISC1_LVDSCLK1_IBEN_MASK;
@@ -165,4 +169,5 @@ void BOARD_BootClockRUN(void)
     //enable clock gate
     CLOCK_EnableClock(kCLOCK_Semc);
     //while(1);
+#endif // #if 0 /* Done in DCD */
 }

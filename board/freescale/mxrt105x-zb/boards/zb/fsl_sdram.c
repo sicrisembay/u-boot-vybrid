@@ -11,7 +11,7 @@
 #include "fsl_semc.h"
 #include "../../../../../include/common.h"
 
-#define DEBUG_SDRAM_CONFIG 0
+#define DEBUG_SDRAM_CONFIG 1
 
 static void MEM_WriteU32(uint32_t addr, uint32_t val)
 {
