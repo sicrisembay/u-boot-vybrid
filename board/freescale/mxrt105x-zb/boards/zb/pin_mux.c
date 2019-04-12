@@ -79,6 +79,7 @@ void BOARD_InitPins(void) {
     IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_01_GPIO1_IO17, 0U);
     IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_01_GPIO1_IO17, 0xB8B0u);
 
+#if 0 /* Done in DCD */
     /* Initialize SEMC IO used for SDRAM and NAND Flash */
     // Config IOMUX for sdr
     BOARD_WriteU32(0x401F8014,0x00000000); // EMC_00
@@ -170,64 +171,7 @@ void BOARD_InitPins(void) {
     BOARD_WriteU32(0x401F82A0,0x000110F9); // EMC_39, DQS Pin
     BOARD_WriteU32(0x401F82A4,0x0000F8F9); // EMC_40, RDY Pin
     BOARD_WriteU32(0x401F82A8,0x000110F9); // EMC_41, CSX0 Pin
-
-#if 0
-    IOMUXC_SetPinMux(IOMUXC_GPIO_SD_B0_00_USDHC1_CMD, 0);
-    IOMUXC_SetPinMux(IOMUXC_GPIO_SD_B0_01_USDHC1_CLK, 0);
-    IOMUXC_SetPinMux(IOMUXC_GPIO_SD_B0_02_USDHC1_DATA0, 0);
-    IOMUXC_SetPinMux(IOMUXC_GPIO_SD_B0_03_USDHC1_DATA1, 0);
-    IOMUXC_SetPinMux(IOMUXC_GPIO_SD_B0_04_USDHC1_DATA2, 0);
-    IOMUXC_SetPinMux(IOMUXC_GPIO_SD_B0_05_USDHC1_DATA3, 0);
-    /* card detect pin */
-    IOMUXC_SetPinMux(IOMUXC_GPIO_B1_12_USDHC1_CD_B, 0);
-    /* SD0_VSELECT */
-    IOMUXC_SetPinMux(IOMUXC_GPIO_B1_14_USDHC1_VSELECT, 0);// IOMUXC_GPIO_B1_14_USDHC1_VSELECT, 0);
-    IOMUXC_SetPinMux(IOMUXC_GPIO_B1_15_GPIO2_IO31, 0);// IOMUXC_GPIO_B1_14_USDHC1_VSELECT, 0);
-
-    IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B0_00_USDHC1_CMD, IOMUXC_SW_PAD_CTL_PAD_SRE_MASK | IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-                                                       IOMUXC_SW_PAD_CTL_PAD_PUE_MASK | IOMUXC_SW_PAD_CTL_PAD_HYS_MASK |
-                                                       IOMUXC_SW_PAD_CTL_PAD_SPEED(1) | IOMUXC_SW_PAD_CTL_PAD_PUS(1) |
-                                                       IOMUXC_SW_PAD_CTL_PAD_DSE(4));
-    IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B0_01_USDHC1_CLK, IOMUXC_SW_PAD_CTL_PAD_SRE_MASK | IOMUXC_SW_PAD_CTL_PAD_HYS_MASK |
-                                                       IOMUXC_SW_PAD_CTL_PAD_SPEED(1) | IOMUXC_SW_PAD_CTL_PAD_PUS(1) |
-                                                       IOMUXC_SW_PAD_CTL_PAD_DSE(4));
-    IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B0_02_USDHC1_DATA0, IOMUXC_SW_PAD_CTL_PAD_SRE_MASK | IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-                                                           IOMUXC_SW_PAD_CTL_PAD_PUE_MASK |
-                                                           IOMUXC_SW_PAD_CTL_PAD_HYS_MASK |
-                                                           IOMUXC_SW_PAD_CTL_PAD_SPEED(1) |
-                                                           IOMUXC_SW_PAD_CTL_PAD_PUS(1) | IOMUXC_SW_PAD_CTL_PAD_DSE(4));
-
-    IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B0_03_USDHC1_DATA1, IOMUXC_SW_PAD_CTL_PAD_SRE_MASK | IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-                                                           IOMUXC_SW_PAD_CTL_PAD_PUE_MASK |
-                                                           IOMUXC_SW_PAD_CTL_PAD_HYS_MASK |
-                                                           IOMUXC_SW_PAD_CTL_PAD_SPEED(1) |
-                                                           IOMUXC_SW_PAD_CTL_PAD_PUS(1) | IOMUXC_SW_PAD_CTL_PAD_DSE(4));
-
-    IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B0_04_USDHC1_DATA2, IOMUXC_SW_PAD_CTL_PAD_SRE_MASK | IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-                                                           IOMUXC_SW_PAD_CTL_PAD_PUE_MASK |
-                                                           IOMUXC_SW_PAD_CTL_PAD_HYS_MASK |
-                                                           IOMUXC_SW_PAD_CTL_PAD_SPEED(1) |
-                                                           IOMUXC_SW_PAD_CTL_PAD_PUS(1) | IOMUXC_SW_PAD_CTL_PAD_DSE(4));
-
-    IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B0_05_USDHC1_DATA3, IOMUXC_SW_PAD_CTL_PAD_SRE_MASK | IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-                                                           IOMUXC_SW_PAD_CTL_PAD_PUE_MASK |
-                                                           IOMUXC_SW_PAD_CTL_PAD_HYS_MASK |
-                                                           IOMUXC_SW_PAD_CTL_PAD_SPEED(1) |
-                                                           IOMUXC_SW_PAD_CTL_PAD_PUS(1) | IOMUXC_SW_PAD_CTL_PAD_DSE(4));
-
-    /* card detect pin */
-    IOMUXC_SetPinConfig(IOMUXC_GPIO_B1_12_USDHC1_CD_B, IOMUXC_SW_PAD_CTL_PAD_PUS(2) | IOMUXC_SW_PAD_CTL_PAD_HYS_MASK |
-                                                            IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-                                                            IOMUXC_SW_PAD_CTL_PAD_PUE_MASK);
-
-    IOMUXC_SetPinConfig(IOMUXC_GPIO_B1_14_USDHC1_VSELECT, IOMUXC_SW_PAD_CTL_PAD_SPEED(1) | IOMUXC_SW_PAD_CTL_PAD_DSE(5) | 
-          IOMUXC_SW_PAD_CTL_PAD_SRE_MASK | IOMUXC_SW_PAD_CTL_PAD_PUS(2) | IOMUXC_SW_PAD_CTL_PAD_PUE_MASK |
-          IOMUXC_SW_PAD_CTL_PAD_PKE_MASK); 
-
-    IOMUXC_SetPinConfig(IOMUXC_GPIO_B1_15_GPIO2_IO31, IOMUXC_SW_PAD_CTL_PAD_PUS(3) | IOMUXC_SW_PAD_CTL_PAD_HYS_MASK | 
-                                                            IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-                                                            IOMUXC_SW_PAD_CTL_PAD_PUE_MASK);
-#endif
+#endif // #if 0 /* Done in DCD */
 }
 
 void BOARD_SetLedState(uint8_t state)

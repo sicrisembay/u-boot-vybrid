@@ -21,7 +21,7 @@
 
 #define CONFIG_SYS_ARCH_TIMER
 
-#define CONFIG_SYS_TEXT_BASE		0x00001000
+#define CONFIG_SYS_TEXT_BASE		0x80001000
 
 /*
  * To get Image data right at the 'Load Address' (0x80008000), and thus avoid
@@ -33,22 +33,22 @@
  * to the slow copy path (and 'FAT: Misaligned buffer address') in fs/fat/fat.c.
  */
 #define CONFIG_SYS_LOAD_ADDR		0x80007fc0
-#define CONFIG_LOADADDR			0x80007fc0
+#define CONFIG_LOADADDR			    0x80007fc0
 
 #define PHYS_SDRAM                  0x80000000
 #define PHYS_SDRAM_SIZE_MB          (16)
 #define PHYS_SDRAM_SIZE_KB          (PHYS_SDRAM_SIZE_MB * 1024)
 #define PHYS_SDRAM_SIZE             (PHYS_SDRAM_SIZE_KB * 1024)
 
-#define DMAMEM_SZ_ALL			(1 * 1024 * 1024)
-#define DMAMEM_BASE			(PHYS_SDRAM + PHYS_SDRAM_SIZE - \
-					 DMAMEM_SZ_ALL)
+#define DMAMEM_SZ_ALL			     (1 * 1024 * 1024)
+#define DMAMEM_BASE			         (PHYS_SDRAM + PHYS_SDRAM_SIZE - \
+					                        DMAMEM_SZ_ALL)
 
 #define CONFIG_CMD_MEMTEST
 #define CONFIG_SYS_MEMTEST_START	PHYS_SDRAM
-#define CONFIG_SYS_MEMTEST_END      	(CONFIG_SYS_MEMTEST_START + PHYS_SDRAM_SIZE - (1024 * 1024))
+#define CONFIG_SYS_MEMTEST_END      (CONFIG_SYS_MEMTEST_START + PHYS_SDRAM_SIZE - (1024 * 1024))
 
-#define CONFIG_SYS_INIT_SP_ADDR		(0x00000000 + 384 * 1024) /* points to end of OCRAM */
+#define CONFIG_SYS_INIT_SP_ADDR		(0x80800000)
 
 #define CONFIG_BOUNCE_BUFFER
 /* #define CONFIG_FSL_ESDHC */
