@@ -121,13 +121,13 @@ void BOARD_BootClockRUN(void)
     /* Disable unused clock */
     BOARD_BootClockGate();
 
+#endif // #if 0 /* Done in DCD */
 
     /* Power down all unused PLL */    
     CLOCK_DeinitAudioPll();
     CLOCK_DeinitVideoPll();
     CLOCK_DeinitEnetPll();
     CLOCK_DeinitUsb2Pll();
-#endif // #if 0 /* Done in DCD */
     /* Update core clock */
     SystemCoreClockUpdate();
 
