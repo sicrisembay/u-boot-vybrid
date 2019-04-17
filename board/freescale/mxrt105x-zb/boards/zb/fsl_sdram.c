@@ -11,7 +11,7 @@
 #include "fsl_semc.h"
 #include "../../../../../include/common.h"
 
-#define DEBUG_SDRAM_CONFIG 1
+#define DEBUG_SDRAM_CONFIG 0
 
 static void MEM_WriteU32(uint32_t addr, uint32_t val)
 {
@@ -33,8 +33,6 @@ static void SDRAM_WaitIpCmdDone (void)
 
 void SDRAM_Init(void)
 {
-	semc_sdram_config_t sdramConfig;
-	uint32_t clockFreq = CLOCK_GetFreq(kCLOCK_SemcClk);
 #if 0 /* Done in DCD */
 	// Configure SDRAM
 	MEM_WriteU32(0x402F0010,0x8000001B); // BR0, 32MB
@@ -79,7 +77,7 @@ void SDRAM_Init(void)
     printf("\n BR7:   %08X", MEM_ReadU32(0x402F002C));
     printf("\n BR8:   %08X", MEM_ReadU32(0x402F0030));
     printf("\nSDRAM SEMC Configuration");
-    printf("\n ClockFreq: %d", clockFreq);
+    printf("\n ClockFreq: %d", CLOCK_GetFreq(kCLOCK_SemcClk));
     printf("\n SDRAMCR0: %08X", MEM_ReadU32(0x402F0040));
     printf("\n SDRAMCR1: %08X", MEM_ReadU32(0x402F0044));
     printf("\n SDRAMCR2: %08X", MEM_ReadU32(0x402F0048));

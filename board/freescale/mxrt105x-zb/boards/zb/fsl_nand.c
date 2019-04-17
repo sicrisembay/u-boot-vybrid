@@ -12,13 +12,12 @@
 #include "../../../../../include/configs/mxrt105x-zb.h"
 #include "../../../../../include/common.h"
 
-#define DEBUG_NAND_CONFIG  1
+#define DEBUG_NAND_CONFIG  0
 
 #define NAND_SIZE_KB    (131072)
 
 void NAND_Init(void)
 {
-	uint32_t clockFreq = CLOCK_GetFreq(kCLOCK_SemcClk);
 #if 0
 	SEMC_Type *base = SEMC;
 	semc_nand_config_t nandConfig;
@@ -79,7 +78,7 @@ void NAND_Init(void)
     printf("\n BR7:   %08X", BOARD_ReadU32(0x402F002C));
     printf("\n BR8:   %08X", BOARD_ReadU32(0x402F0030));
     printf("\nNAND SEMC Configuration");
-    printf("\n ClockFreq: %d", clockFreq);
+    printf("\n ClockFreq: %d", CLOCK_GetFreq(kCLOCK_SemcClk));
     printf("\n NANDCR0: %08X", BOARD_ReadU32(0x402F0050));
     printf("\n NANDCR1: %08X", BOARD_ReadU32(0x402F0054));
     printf("\n NANDCR2: %08X", BOARD_ReadU32(0x402F0058));

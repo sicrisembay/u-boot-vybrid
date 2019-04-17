@@ -191,6 +191,11 @@ int dram_init(void)
 	return 0;
 }
 
+void board_add_ram_info(int use_default)
+{
+	printf("\nSDRAM Clock: %d", CLOCK_GetFreq(kCLOCK_SemcClk));
+}
+
 int board_init(void)
 {
 #ifdef CONFIG_VIDEO_MXS
