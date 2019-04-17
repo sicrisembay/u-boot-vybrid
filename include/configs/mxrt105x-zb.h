@@ -228,4 +228,8 @@
 
 #undef CONFIG_CMD_IMLS
 
+#ifndef CONFIG_CSF_SIZE
+#define CONFIG_CSF_SIZE			0x2000
+#endif
+
 #endif /* __CONFIG_H */
