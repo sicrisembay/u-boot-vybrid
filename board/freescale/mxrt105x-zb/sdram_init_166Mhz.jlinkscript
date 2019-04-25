@@ -27,6 +27,8 @@ void Clock_Init() {
 
   //==== Configure CCM_ANALOG ================
   // CCM_ANALOG_PLL_ARM
+  // Fout = Fin * div_select/2.0
+  // PLL1_MAIN_CLK = (24MHz * 100) / 2.0 = 1.2GHz
   MEM_WriteU32(0x400D8000, 0x00012064);
   do {
     reg = MEM_ReadU32(0x400D8000);
@@ -34,16 +36,29 @@ void Clock_Init() {
   MEM_WriteU32(0x400D8000, 0x00002064);
 
   // CCM_ANALOG_PLL_SYS
+  // Fout = Fref * 22
+  // Fref = 24MHz (BYPASS_CLK_SRC = 0x0)
+  // NUM = 56
+  // DENOM = 256
+  // SYS_PLL = 24MHz * (22 + 56 / 256) = 533.25MHz
+  MEM_WriteU32(0x400D8050, 0x00000038); // NUM
+  MEM_WriteU32(0x400D8060, 0x00000100); // DENOM
   MEM_WriteU32(0x400D8030, 0x00012001);
   do {
     reg = MEM_ReadU32(0x400D8030);
   } while((reg & 0x80000000) == 0);
   MEM_WriteU32(0x400D8030, 0x00002001);
-
-
+  
+  // PFD2_FRAC = 29 (0x1D)
+  // PLL2_PFD2_CLK = 533.25MHz * 18 / PFD2_FRAC = 330.98MHz
+  MEM_WriteU32(0x400D8100, 0x001D0000);
+  
   //==== Configure CCM =======================
-  // CCM_CBCDR (Perpiph_Clock_podf Div1; Semc_podf Div4; Ahb_podf Div1; Ipg_podf Div4)
-  MEM_WriteU32(0x400FC014, 0x000B8300);
+  // CCM_CBCDR (Periph_Clock_podf Div1; Semc_podf Div 2; Ahb_podf Div1; Ipg_podf Div4)
+  // SEMC_ALT_CLK_SEL = 0 (PLL2_PFD2_CLK)
+  // SEMC_CLK_SEL = 1 (Use ALT_CLK which is PLL2_PFD2)
+  // SEMC_CLK_ROOT = PLL2_PFD2_CLK / SEMC_PODF = 330.98MHz / 2 = 165.5MHz
+  MEM_WriteU32(0x400FC014, 0x00098340);
   // Wait for ALL divider handshake is finished
   do {
     reg = MEM_ReadU32(0x400FC048);

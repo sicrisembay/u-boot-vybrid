@@ -193,7 +193,7 @@ int dram_init(void)
 
 void board_add_ram_info(int use_default)
 {
-	printf("\nSDRAM Clock: %d", CLOCK_GetFreq(kCLOCK_SemcClk));
+	printf("\nDRAM Clock: %iMHz", CLOCK_GetFreq(kCLOCK_SemcClk) / 1000 / 1000);
 }
 
 int board_init(void)
