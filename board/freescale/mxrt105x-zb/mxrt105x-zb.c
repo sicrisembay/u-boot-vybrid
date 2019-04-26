@@ -37,7 +37,9 @@ static void mxrt105x_zb_usb_init(void)
 
 int board_early_init_f(void)
 {
+#if 0
 	semc_config_t config;
+#endif /* Removed... this is initialized by DCD */
 
 	BOARD_BootClockRUN();
 

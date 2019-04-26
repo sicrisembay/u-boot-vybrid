@@ -16,6 +16,18 @@ Purpose :
 
 void Clock_Init() {
   unsigned int reg;
+  
+  //==== DCDC Setting ========================
+  // Setting the VDD_SOC to 1.275V. It is necessary to config AHB to 600Mhz. */
+  reg = MEM_ReadU32(0x4008000C);
+  reg = reg & 0xFFFFFFE0;
+  reg = reg | 0x13;
+  MEM_WriteU32(0x4008000C, reg);
+  /* Waiting for DCDC_STS_DC_OK bit is asserted */
+  do {
+    reg = MEM_ReadU32(0x40080000);
+  } while ((reg & 0x80000000) == 0);
+
   // Enable all clocks
   MEM_WriteU32(0x400FC068,0xffffffff);
   MEM_WriteU32(0x400FC06C,0xffffffff);

@@ -90,8 +90,9 @@ void BOARD_BootClockRUN(void)
 
     /* Boot ROM did initialize the XTAL, here we only sets external XTAL OSC freq */
     CLOCK_SetXtalFreq(24000000U);
-    CLOCK_SetRtcXtalFreq(32768U);
+    //CLOCK_SetRtcXtalFreq(32768U);  // This board doesn't have this.
 
+#if 0 /* Done in DCD */
     // setup the CLO to CLKO1, CLKO1_DIV=6, sel to AHB_CLK
     CCM->CCOSR = 0xDB;
 
@@ -103,7 +104,6 @@ void BOARD_BootClockRUN(void)
 
     while (!(DCDC->REG0 & 0x80000000)); // wait for DCDC ok
 
-#if 0 /* Done in DCD */
     // Move PERIPH_CLK OSC24M
     CLOCK_SetMux(kCLOCK_PeriphMux, 0x1);
     //CLOCK_SetMux(kCLOCK_PeriphClk2Mux, 0x1);
