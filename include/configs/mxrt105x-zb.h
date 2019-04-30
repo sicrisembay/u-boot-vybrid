@@ -8,6 +8,8 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
+#define CPU_MIMXRT1052DVL6A
+
 #if 0
 #define DEBUG
 #endif

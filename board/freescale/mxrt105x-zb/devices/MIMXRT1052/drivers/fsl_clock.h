@@ -32,10 +32,10 @@
 #ifndef _FSL_CLOCK_H_
 #define _FSL_CLOCK_H_
 
-#include "fsl_device_registers.h"
+#include "../fsl_device_registers.h"
 //#include <stdint.h>
 #include <stdbool.h>
-#include <assert.h>
+#include "../../../CMSIS/Include/assert.h"
 
 /*!
  * @addtogroup clock

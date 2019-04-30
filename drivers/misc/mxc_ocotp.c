@@ -79,6 +79,9 @@
 #elif defined(CONFIG_MX7ULP)
 #define FUSE_BANK_SIZE	0x80
 #define FUSE_BANKS	31
+#elif defined(CONFIG_ARCH_IMXRT105X)
+#define FUSE_BANK_SIZE  0x80
+#define FUSE_BANKS      6
 #else
 #error "Unsupported architecture\n"
 #endif
@@ -147,9 +150,84 @@ u32 fuse_word_physical(u32 bank, u32 word_index)
 {
 	return word_index;
 }
-
 #endif
 
+#ifdef CONFIG_ARCH_IMXRT105X
+static void wait_busy(OCOTP_Type * base, unsigned int delay_us)
+{
+	while(base->CTRL & BM_CTRL_BUSY) {
+		udelay(delay_us);
+	}
+}
+
+static void clear_error(OCOTP_Type * base)
+{
+	base->CTRL_CLR = BM_CTRL_ERROR;
+}
+
+static int prepare_access(OCOTP_Type * base, u32 bank, u32 word,
+				int assert, const char *caller)
+{
+	if (bank >= FUSE_BANKS ||
+	    word >= 8 ||
+	    !assert) {
+		printf("mxc_ocotp %s(): Invalid argument\n", caller);
+		return -EINVAL;
+	}
+
+	CLOCK_EnableClock(kCLOCK_Ocotp);
+
+	wait_busy(base, 1);
+	clear_error(base);
+
+	return 0;
+}
+
+static int finish_access(OCOTP_Type * base, const char *caller)
+{
+	u32 err;
+
+	err = !!(base->CTRL & BM_CTRL_ERROR);
+	clear_error(base);
+
+	if (err) {
+		printf("mxc_ocotp %s(): Access protect error\n", caller);
+		return -EIO;
+	}
+
+	return 0;
+}
+
+static int prepare_read(OCOTP_Type * base, u32 bank, u32 word, u32 *val,
+			const char *caller)
+{
+	return prepare_access(base, bank, word, val != NULL, caller);
+}
+
+int fuse_read(u32 bank, u32 word, u32 *val)
+{
+	OCOTP_Type * base = OCOTP;
+	int ret;
+	u32 phy_bank;
+	u32 phy_word;
+
+	uint32_t *pBank;
+	uint32_t *pWord;
+
+	ret = prepare_read(base, bank, word, val, __func__);
+	if (ret)
+		return ret;
+
+	phy_bank = fuse_bank_physical(bank);
+	phy_word = fuse_word_physical(bank, word);
+
+	pBank = (uint32_t *)((uint32_t)(&(base->LOCK)) + (phy_bank * FUSE_BANK_SIZE));
+	pWord = (uint32_t *)((uint32_t)pBank + (phy_word * 0x10));
+	*val = *pWord;
+
+	return finish_access(base, __func__);
+}
+#else
 static void wait_busy(struct ocotp_regs *regs, unsigned int delay_us)
 {
 	while (readl(&regs->ctrl) & BM_CTRL_BUSY)
@@ -239,6 +317,8 @@ int fuse_read(u32 bank, u32 word, u32 *val)
 #endif
 	return finish_access(regs, __func__);
 }
+#endif
+
 
 #ifdef CONFIG_MX7
 static void set_timing(struct ocotp_regs *regs)
@@ -263,7 +343,28 @@ static void set_timing(struct ocotp_regs *regs)
 {
 	/* No timing set for MX7ULP */
 }
+#elif defined(CONFIG_ARCH_IMXRT105X)
+static void set_timing(OCOTP_Type * base)
+{
+	u32 ipg_clk;
+	u32 relax, strobe_read, strobe_prog;
+	u32 timing;
 
+	ipg_clk = CLOCK_GetFreq(kCLOCK_IpgClk);
+
+	relax = DIV_ROUND_UP(ipg_clk * BV_TIMING_RELAX_NS, 1000000000) - 1;
+	strobe_read = DIV_ROUND_UP(ipg_clk * BV_TIMING_STROBE_READ_NS,
+					1000000000) + 2 * (relax + 1) - 1;
+	strobe_prog = DIV_ROUND_CLOSEST(ipg_clk * BV_TIMING_STROBE_PROG_US,
+						1000000) + 2 * (relax + 1) - 1;
+
+	timing = BF(strobe_read, TIMING_STROBE_READ) |
+			BF(relax, TIMING_RELAX) |
+			BF(strobe_prog, TIMING_STROBE_PROG);
+
+	base->TIMING = (base->TIMING & ~(BM_TIMING_STROBE_READ | BM_TIMING_RELAX |
+			BM_TIMING_STROBE_PROG)) | timing;
+}
 #else
 static void set_timing(struct ocotp_regs *regs)
 {
@@ -288,6 +389,84 @@ static void set_timing(struct ocotp_regs *regs)
 }
 #endif
 
+#ifdef CONFIG_ARCH_IMXRT105X
+static void setup_direct_access(OCOTP_Type * base, u32 bank, u32 word,
+				int write)
+{
+	u32 wr_unlock = write ? BV_CTRL_WR_UNLOCK_KEY : 0;
+	u32 addr;
+	addr = bank << 3 | word;
+	set_timing(base);
+
+	base->CTRL = (base->CTRL & ~(BM_CTRL_WR_UNLOCK | BM_CTRL_ADDR)) |
+					(BF(wr_unlock, CTRL_WR_UNLOCK) | BF(addr, CTRL_ADDR));
+}
+
+int fuse_sense(u32 bank, u32 word, u32 *val)
+{
+	OCOTP_Type * base = OCOTP;
+	int ret;
+
+	ret = prepare_read(base, bank, word, val, __func__);
+	if (ret)
+		return ret;
+
+	setup_direct_access(base, bank, word, false);
+	base->READ_CTRL = BM_READ_CTRL_READ_FUSE;
+	wait_busy(base, 1);
+	*val = base->READ_FUSE_DATA;
+
+	return finish_access(base, __func__);
+}
+
+static int prepare_write(OCOTP_Type * base, u32 bank, u32 word,
+				const char *caller)
+{
+	return prepare_access(base, bank, word, true, caller);
+}
+
+int fuse_prog(u32 bank, u32 word, u32 val)
+{
+	OCOTP_Type * base = OCOTP;
+	int ret;
+
+	ret = prepare_write(base, bank, word, __func__);
+	if (ret)
+		return ret;
+
+	setup_direct_access(base, bank, word, true);
+	base->DATA = val;
+	wait_busy(base, BV_TIMING_STROBE_PROG_US);
+	udelay(WRITE_POSTAMBLE_US);
+
+	return finish_access(base, __func__);
+}
+
+int fuse_override(u32 bank, u32 word, u32 val)
+{
+	OCOTP_Type * base = OCOTP;
+	int ret;
+	u32 phy_bank;
+	u32 phy_word;
+
+	uint32_t *pBank;
+	uint32_t *pWord;
+
+	ret = prepare_write(base, bank, word, __func__);
+	if (ret)
+		return ret;
+
+	phy_bank = fuse_bank_physical(bank);
+	phy_word = fuse_word_physical(bank, word);
+
+	pBank = (uint32_t *)((uint32_t)(&(base->LOCK)) + (phy_bank * FUSE_BANK_SIZE));
+	pWord = (uint32_t *)((uint32_t)pBank + (phy_word * 0x10));
+
+	*pWord = val;
+
+	return finish_access(base, __func__);
+}
+#else
 static void setup_direct_access(struct ocotp_regs *regs, u32 bank, u32 word,
 				int write)
 {
@@ -426,3 +605,5 @@ int fuse_override(u32 bank, u32 word, u32 val)
 
 	return finish_access(regs, __func__);
 }
+
+#endif

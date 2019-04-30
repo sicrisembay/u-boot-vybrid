@@ -7,6 +7,7 @@
 #ifndef _ASM_ARCH_IMX_REGS_H
 #define _ASM_ARCH_IMX_REGS_H
 
-#include <asm/mach-imx/regs-lcdif.h>
+#include "../../../../board/freescale/mxrt105x-zb/devices/MIMXRT1052/MIMXRT1052.h"
+#include "../../../../board/freescale/mxrt105x-zb/devices/MIMXRT1052/drivers/fsl_clock.h"
 
 #endif

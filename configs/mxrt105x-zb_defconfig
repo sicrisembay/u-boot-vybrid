@@ -370,7 +370,7 @@ CONFIG_CMD_FPGA=y
 # CONFIG_CMD_FPGA_LOADMK is not set
 # CONFIG_CMD_FPGA_LOADP is not set
 # CONFIG_CMD_FPGAD is not set
-# CONFIG_CMD_FUSE is not set
+CONFIG_CMD_FUSE=y
 # CONFIG_CMD_GPIO is not set
 # CONFIG_CMD_FDC is not set
 # CONFIG_CMD_SATA is not set
@@ -585,7 +585,7 @@ CONFIG_DM_DEV_READ_INLINE=y
 # CONFIG_CROS_EC is not set
 # CONFIG_DS4510 is not set
 # CONFIG_FSL_SEC_MON is not set
-# CONFIG_MXC_OCOTP is not set
+CONFIG_MXC_OCOTP=y
 # CONFIG_NUVOTON_NCT6102D is not set
 # CONFIG_PWRSEQ is not set
 # CONFIG_PCA9551_LED is not set
