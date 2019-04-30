@@ -1109,7 +1109,7 @@ source "arch/arm/mach-mvebu/Kconfig"
 
 source "arch/arm/cpu/armv7/ls102xa/Kconfig"
 
-source "arch/arm/mach-imxrt105x/Kconfig"
+source "arch/arm/mach-imx/mxrt105x/Kconfig"
 
 source "arch/arm/mach-imx/mx7ulp/Kconfig"
 
