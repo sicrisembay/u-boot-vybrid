@@ -7,6 +7,7 @@
 
 #include <common.h>
 #include <asm/io.h>
+#include <asm/arch/imx-regs.h>
 
 void mxs_set_lcdclk(uint32_t __maybe_unused lcd_base, uint32_t freq)
 {
@@ -51,5 +52,14 @@ void mxs_set_lcdclk(uint32_t __maybe_unused lcd_base, uint32_t freq)
 			val |= clk[i].reg[k].val;
 			writel(val, base + clk[i].reg[k].ofs);
 		}
+	}
+}
+
+void hab_caam_clock_enable(unsigned char enable)
+{
+	if(enable) {
+		CLOCK_EnableClock(kCLOCK_Dcp);
+	} else {
+		CLOCK_DisableClock(kCLOCK_Dcp);
 	}
 }

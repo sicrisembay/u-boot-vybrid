@@ -15,6 +15,19 @@
 
 /* -------- start of HAB API updates ------------*/
 
+#ifdef CONFIG_ARCH_IMXRT105X
+#define hab_rvt_report_event_p        ((hab_rvt_report_event_t *)HAB_RVT_REPORT_EVENT)
+#define hab_rvt_report_status_p       ((hab_rvt_report_status_t *)HAB_RVT_REPORT_STATUS)
+#define hab_rvt_authenticate_image_p  ((hab_rvt_authenticate_image_t *)HAB_RVT_AUTHENTICATE_IMAGE)
+#define hab_rvt_entry_p               ((hab_rvt_entry_t *)HAB_RVT_ENTRY)
+#define hab_rvt_exit_p                ((hab_rvt_exit_t *)HAB_RVT_EXIT)
+#define IS_HAB_ENABLED_BIT            (0x2)
+
+struct imx_sec_config_fuse_t const imx_sec_config_fuse = {   // Note: this is a hack
+	.bank = 0,
+	.word = 6,
+};
+#else
 #define hab_rvt_report_event_p					\
 (								\
 	(is_mx6dqp()) ?						\
@@ -70,15 +83,17 @@
 	((hab_rvt_exit_t *)HAB_RVT_EXIT)			\
 )
 
-#define IVT_SIZE		0x20
-#define ALIGN_SIZE		0x1000
-#define CSF_PAD_SIZE		0x2000
 #define MX6DQ_PU_IROM_MMU_EN_VAR	0x009024a8
 #define MX6DLS_PU_IROM_MMU_EN_VAR	0x00901dd0
 #define MX6SL_PU_IROM_MMU_EN_VAR	0x00900a18
 #define IS_HAB_ENABLED_BIT \
 	(is_soc_type(MXC_SOC_MX7ULP) ? 0x80000000 :	\
 	 (is_soc_type(MXC_SOC_MX7) ? 0x2000000 : 0x2))
+#endif // #ifdef CONFIG_ARCH_IMXRT105X
+
+#define IVT_SIZE		0x20
+#define ALIGN_SIZE		0x1000
+#define CSF_PAD_SIZE		0x2000
 
 /*
  * +------------+  0x0 (DDR_UIMAGE_START) -
@@ -470,6 +485,7 @@ uint32_t authenticate_image(uint32_t ddr_start, uint32_t image_size)
 			 * setting this bit, authentication will fail and may
 			 * crash.
 			 */
+#ifndef CONFIG_ARCH_IMXRT105X
 			/* Check MMU enabled */
 			if (is_soc_type(MXC_SOC_MX6) && get_cr() & CR_M) {
 				if (is_mx6dq()) {
@@ -487,7 +503,7 @@ uint32_t authenticate_image(uint32_t ddr_start, uint32_t image_size)
 					writel(1, MX6SL_PU_IROM_MMU_EN_VAR);
 				}
 			}
-
+#endif  // #ifndef CONFIG_ARCH_IMXRT105X
 			load_addr = (uint32_t)hab_rvt_authenticate_image(
 					HAB_CID_UBOOT,
 					ivt_offset, (void **)&start,

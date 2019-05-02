@@ -90,8 +90,12 @@ struct imx_sec_config_fuse_t {
 	int word;
 };
 
+#if defined(CONFIG_ARCH_IMXRT105X) /* hack: without CONFIG_SECURE_BOOT */
+extern struct imx_sec_config_fuse_t const imx_sec_config_fuse;
+#else
 #if defined(CONFIG_SECURE_BOOT)
 extern struct imx_sec_config_fuse_t const imx_sec_config_fuse;
+#endif
 #endif
 
 /*Function prototype description*/
@@ -122,10 +126,14 @@ typedef void hapi_clock_init_t(void);
 #define HAB_ENG_RTL		0x77   /* RTL simulation engine */
 #define HAB_ENG_SW		0xff   /* Software engine */
 
+#ifdef CONFIG_ARCH_IMXRT105X
+#define HAB_RVT_BASE			0x00200300
+#else
 #ifdef CONFIG_ROM_UNIFIED_SECTIONS
 #define HAB_RVT_BASE			0x00000100
 #else
 #define HAB_RVT_BASE			0x00000094
+#endif
 #endif
 
 #define HAB_RVT_ENTRY			(*(uint32_t *)(HAB_RVT_BASE + 0x04))
