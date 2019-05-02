@@ -41,6 +41,7 @@ tune-$(CONFIG_CPU_PXA)		=-mcpu=xscale
 tune-$(CONFIG_CPU_ARM1136)	=
 tune-$(CONFIG_CPU_ARM1176)	=
 tune-$(CONFIG_CPU_V7)		=
+tune-$(CONFIG_CPU_V7M)		=-mno-fdpic
 tune-$(CONFIG_ARM64)		=
 
 # Evaluate tune cc-option calls now
