@@ -389,7 +389,9 @@ static int do_authenticate_image(cmd_tbl_t *cmdtp, int flag, int argc,
 
 	rcode = authenticate_image(addr, ivt_offset);
 
-	return rcode;
+	return (rcode != 0)
+			? CMD_RET_SUCCESS
+		    : CMD_RET_FAILURE;
 }
 
 U_BOOT_CMD(
