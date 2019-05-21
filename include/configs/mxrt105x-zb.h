@@ -129,8 +129,8 @@
                 "if ubi check fs;" \
                     "then ubi remove fs;" \
 				"fi;" \
-				"ubi create config1 1048576;" \
-	            "ubi create config2 1048576;" \
+				"ubi create config1 0x1F8000;" \
+	            "ubi create config2 0x1F8000;" \
 	            "ubi create fs;" \
 	            "setenv ubootFirstRun false;" \
 				"saveenv\0" \
@@ -143,7 +143,7 @@
               "usb reset;" \
 	          "if fatload usb 0:auto \${loadaddr} \${bootfile};" \
 	              "then echo \${bootfile} loaded at \${loadaddr};" \
-	                  "if imi \${loadaddr};" \
+	                  "if iminfo \${loadaddr};" \
                           "then source \${loadaddr};" \
                           "else echo Invalid Script File Header!;" \
                       "fi;" \
@@ -152,13 +152,11 @@
 	          "usb stop;" \
 	          "echo ===== Running Application =====;" \
 	          "run nandboot\0" \
-    "appfile=/firmware/project_tres.bin\0" \
-	"apploadaddr=0x80000000\0" \
+    "appfile=/firmware/project_tres.uImage\0" \
+	"apploadaddr=0x800003C0\0" \
 	"nandboot=ubifsmount ubi0:fs && " \
 			  "ubifsload \${apploadaddr} \${appfile} && " \
-			  "setexpr jumpAddr \${apploadaddr} + 0x4 && " \
-			  "setexpr jumpAddr *\${jumpAddr} && " \
-			  "go \${jumpAddr}\0"
+			  "bootm \${apploadaddr}\0"
 
 /*
  * Command line configuration.

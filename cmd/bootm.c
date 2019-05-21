@@ -21,6 +21,10 @@
 #include <linux/err.h>
 #include <u-boot/zlib.h>
 
+#if defined(CONFIG_TARGET_MXRT105X_ZB)
+#include "../arch/arm/include/asm/mach-imx/hab.h"
+#endif
+
 DECLARE_GLOBAL_DATA_PTR;
 
 #if defined(CONFIG_CMD_IMI)
@@ -91,6 +95,7 @@ static int do_bootm_subcommand(cmd_tbl_t *cmdtp, int flag, int argc,
 
 int do_bootm(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
+	int rcode = 0;
 #ifdef CONFIG_NEEDS_MANUAL_RELOC
 	static int relocated = 0;
 
@@ -122,6 +127,25 @@ int do_bootm(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 		if ((*endp != 0) && (*endp != ':') && (*endp != '#'))
 			return do_bootm_subcommand(cmdtp, flag, argc, argv);
 	}
+
+#if defined(CONFIG_TARGET_MXRT105X_ZB)
+	{
+		ulong addr, ivt_offset;
+		image_header_t *hdr;
+		addr = simple_strtoul(argv[0], NULL, 16);
+		hdr = (image_header_t *)addr;
+		if(genimg_get_format((void*)hdr) != IMAGE_FORMAT_LEGACY) {
+			printf("MXRT105X_ZB supports only Legacy Image Format!\n");
+			return CMD_RET_FAILURE;
+		}
+		ivt_offset = image_get_image_size((image_header_t*)addr);
+		rcode = authenticate_image(addr, ivt_offset);
+		if( rcode == 0) {
+			printf("Image HAB authentication failed!\n");
+			return CMD_RET_FAILURE;
+		}
+	}
+#endif
 
 	return do_bootm_states(cmdtp, flag, argc, argv, BOOTM_STATE_START |
 		BOOTM_STATE_FINDOS | BOOTM_STATE_FINDOTHER |
