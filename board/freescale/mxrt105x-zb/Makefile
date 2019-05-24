@@ -28,6 +28,8 @@ obj-y	:= mxrt105x-zb.o	\
 	./devices/MIMXRT1052/drivers/fsl_gpio.o	\
 	./devices/MIMXRT1052/drivers/fsl_cache.o	\
 	./devices/MIMXRT1052/drivers/fsl_lpuart.o	\
+	./devices/MIMXRT1052/drivers/fsl_lpspi.o \
+	./devices/MIMXRT1052/drivers/fsl_lpi2c.o \
 	./devices/MIMXRT1052/drivers/fsl_usdhc.o	\
 	./devices/MIMXRT1052/drivers/fsl_clock.o	\
 	./devices/MIMXRT1052/drivers/fsl_pit.o	\
@@ -42,7 +44,6 @@ obj-y	:= mxrt105x-zb.o	\
 	./boards/evkmimrt1050/demo_apps/fat_tool/fsl_phy.o
 
 #	./devices/MIMXRT1052/drivers/fsl_common.o	\
-	./devices/MIMXRT1052/drivers/fsl_lpi2c.o	\
 	./devices/MIMXRT1052/drivers/fsl_elcdif.o	\
 	./devices/MIMXRT1052/drivers/fsl_sai.o	\
 	./devices/MIMXRT1052/drivers/fsl_wdog.o	\
@@ -52,4 +53,6 @@ obj-y	:= mxrt105x-zb.o	\
 	./devices/MIMXRT1052/utilities/fsl_notifier.o	\
 	./devices/MIMXRT1052/utilities/fsl_io.o	\
 	./devices/MIMXRT1052/utilities/fsl_debug_console.o	\
-#	./devices/MIMXRT1052/drivers/fsl_edma.o	\
+	./devices/MIMXRT1052/drivers/fsl_edma.o	\
+	
+obj-$(CONFIG_MXRT105X_ZB_DISP_LT7381) += boards/zb/lt7381/

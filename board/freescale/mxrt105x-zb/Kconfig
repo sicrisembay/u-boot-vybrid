@@ -15,5 +15,13 @@ config SYS_SOC
 config SYS_CONFIG_NAME
 	string
 	default "mxrt105x-zb"
+	
+menu "MXRT105X-ZB Board Setting"
+	depends on TARGET_MXRT105X_ZB
+	
+config MXRT105X_ZB_DISP_LT7381
+    bool "LT7381 Display"
+
+endmenu
 
 endif

@@ -18,6 +18,11 @@
 #include "boards/zb/fsl_sdram.h"
 #include "fsl_semc.h"
 
+#if defined(CONFIG_MXRT105X_ZB_DISP_LT7381)
+#include "drivers/fsl_lpspi.h"
+#include "boards/zb/lt7381/BSP_tftLT7381.h"
+#endif
+
 DECLARE_GLOBAL_DATA_PTR;
 
 void BOARD_BootClockRUN(void);
@@ -64,6 +69,7 @@ int board_early_init_f(void)
 	config.dqsMode = kSEMC_Loopbackdqspad;
 	SEMC_Init(SEMC, &config);
 #endif // #if 0 /* Done in DCD */
+
 	mxrt105x_zb_usb_init();
 
 	return 0;
@@ -203,7 +209,10 @@ int board_init(void)
 #ifdef CONFIG_VIDEO_MXS
 	setup_lcd();
 #endif
-
+#if defined(CONFIG_MXRT105X_ZB_DISP_LT7381)
+	printf("Show Splash\n");
+	BSP_TFT_LT7381_Init();
+#endif
 	return 0;
 }
 
