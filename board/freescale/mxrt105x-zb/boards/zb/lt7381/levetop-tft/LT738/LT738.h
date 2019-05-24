@@ -224,8 +224,8 @@ void PCLK_Rising(void);
 #endif
 void PCLK_Falling(void);
 void Display_ON(void);
-#if 0
 void Display_OFF(void);
+#if 0
 void Color_Bar_ON(void);
 void Color_Bar_OFF(void);
 void HSCAN_L_to_R(void);

@@ -567,7 +567,9 @@ static void _TFT_LT7381_Init(void)
 
     for(thickness = 1; thickness <= LCD_YSIZE_TFT/12; thickness++) {
     	Delay_ms(25);
+    	Display_OFF();
         LT738_DrawCircle_Width(LCD_XSIZE_TFT/2, LCD_YSIZE_TFT/2, LCD_YSIZE_TFT/6, Red, Black, thickness);
+    	Display_ON();
     }
 }
 

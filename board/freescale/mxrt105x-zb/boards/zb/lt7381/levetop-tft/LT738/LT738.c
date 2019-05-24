@@ -1831,7 +1831,6 @@ Display ON/OFF
 	temp |= cSetb6;
 	LCD_DataWrite(temp);
 }
-#if 0
 void Display_OFF(void)
 {
 /*	
@@ -1846,6 +1845,7 @@ Display ON/OFF
 	temp &= cClrb6;
 	LCD_DataWrite(temp);
 }
+#if 0
 void Color_Bar_ON(void)
 {
 /*	
