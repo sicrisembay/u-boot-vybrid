@@ -3,6 +3,11 @@
 #include "LT738.h"
 #include "BSP_tftLT7381.h"
 
+#define XI_4M    0
+#define XI_8M    0
+#define XI_10M   1
+#define XI_12M   0
+
 //��Ļ�ֱ���
 #define LCD_XSIZE_TFT    320	
 #define LCD_YSIZE_TFT    240

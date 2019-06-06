@@ -79,16 +79,6 @@ void LT738_PLL_Initial(void)
 	if(MCLK > 100)	MCLK = 100;
 	if(SCLK > 65)		SCLK = 65;
 
-	lpllOD_sclk = 2;
-    lpllOD_cclk = 2;
-    lpllOD_mclk = 2;
-    lpllR_sclk  = 5;
-    lpllR_cclk  = 5;
-    lpllR_mclk  = 5;
-    lpllN_mclk  = MCLK;
-    lpllN_cclk  = CCLK;
-    lpllN_sclk  = SCLK;
-
 #if XI_4M 	
 	
 	lpllOD_sclk = 3;
