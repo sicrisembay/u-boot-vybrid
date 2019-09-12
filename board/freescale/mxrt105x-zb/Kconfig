@@ -22,6 +22,10 @@ menu "MXRT105X-ZB Board Setting"
 config MXRT105X_ZB_DISP_LT7381
     bool "LT7381 Display"
 
+config MXRT105X_ZB_VER
+    int "Board Revision"
+    default 3
+    
 endmenu
 
 endif

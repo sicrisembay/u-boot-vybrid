@@ -3673,6 +3673,7 @@ void Select_PWM1_is_Osc_Clock(void)
 	temp |= cSetb2;
 	LCD_DataWrite(temp);
 }
+#endif
 //[85h].[bit1][bit0]=========================================================================
 /*
 XPWM[0] pin function control
@@ -3709,6 +3710,7 @@ void Select_PWM0_is_Core_Clock(void)
 	temp |= cSetb0;
 	LCD_DataWrite(temp);
 }
+#if 0
 //[86h]=========================================================================
 //[86h]PWM1
 void Enable_PWM1_Inverter(void)
@@ -5629,7 +5631,7 @@ GPO-B[7:4] : General Purpose Output ; share with XKOUT[3:0] ;
 	temp=LCD_DataRead();
 	return temp;
 }
-
+#endif
 //[F3h]=========================================================================
 void Set_GPIO_C_In_Out(unsigned char temp)
 {
@@ -5662,6 +5664,7 @@ share with {XPWM0, XI2CSDA, XI2CSCL, XnSFCS1, XnSFCS0,XMISO, XMOSI, XSCLK}
 	temp=LCD_DataRead();
 	return temp;
 }
+#if 0
 //[F5h]=========================================================================
 void Set_GPIO_D_In_Out(unsigned char temp)
 {

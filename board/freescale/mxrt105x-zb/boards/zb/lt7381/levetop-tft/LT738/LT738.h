@@ -412,10 +412,12 @@ void Select_PWM1_is_ErrorFlag(void);
 void Select_PWM1(void);
 #if 0
 void Select_PWM1_is_Osc_Clock(void);
+#endif
 //[85h].[bit1][bit0]
 void Select_PWM0_is_GPIO_C7(void);
 void Select_PWM0(void);
 void Select_PWM0_is_Core_Clock(void);
+#if 0
 //**[86h]**//
 //[86h]PWM1
 void Enable_PWM1_Inverter(void);
@@ -612,10 +614,12 @@ unsigned char Read_GPIO_A_7_0(void);
 //[F2h]
 void Write_GPIO_B_7_4(unsigned char temp);
 unsigned char Read_GPIO_B_7_0(void);
+#endif
 //[F3h][F4h]
 void Set_GPIO_C_In_Out(unsigned char temp);
 void Write_GPIO_C_7_0(unsigned char temp);
 unsigned char Read_GPIO_C_7_0(void);
+#if 0
 //[F5h][F6h]
 void Set_GPIO_D_In_Out(unsigned char temp);
 void Write_GPIO_D_7_0(unsigned char temp);
