@@ -17,14 +17,27 @@ config SYS_CONFIG_NAME
 	default "mxrt105x-zb"
 	
 menu "MXRT105X-ZB Board Setting"
-	depends on TARGET_MXRT105X_ZB
 	
+choice
+    prompt "MXRT105X ZB Revision"
+    
+config MXRT105X_ZB_VER3
+    bool "Version 3"
+
+config MXRT105X_ZB_VER4
+    bool "Version 4"
+    
+endchoice
+
 config MXRT105X_ZB_DISP_LT7381
     bool "LT7381 Display"
+    default y
+    depends on MXRT105X_ZB_VER3
 
-config MXRT105X_ZB_VER
-    int "Board Revision"
-    default 3
+config MXRT105X_ZB_DISP_FRIDA
+    bool "Frida LCD"
+    default y
+    depends on MXRT105X_ZB_VER4
     
 endmenu
 

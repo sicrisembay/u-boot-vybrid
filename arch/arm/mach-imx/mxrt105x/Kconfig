@@ -15,7 +15,4 @@ config TARGET_MXRT105X_ZB
 
 endchoice
 
-source "board/freescale/mxrt105x-evk/Kconfig"
-source "board/freescale/mxrt105x-zb/Kconfig"
-
 endif

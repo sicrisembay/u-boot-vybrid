@@ -171,12 +171,10 @@ BSP_TFTLT7381_RET_T BSP_TFT_LT7381_Init(void)
     /* Configure LCD_RESET */
 	IOMUXC_SetPinMux(DIG_OUT_LCD_RESET_MUX, 0U);
 	GPIO_PinInit(DIG_OUT_LCD_RESET_GPIO_BASE, DIG_OUT_LCD_RESET_IO_PIN, &pin_config);
-#if(CONFIG_MXRT105X_ZB_VER < 3) /* Version 2 and older */
 	/* Configure LCD Backlight pin */
 	if(BSP_TCA9535_NOERROR != BSP_TCA9535_Init()) {
 		printf("BSP_TFT_LT7381_Init: Error in BSP_TCA9535_Init()\n");
 	}
-#endif /* CONFIG_MXRT105X_ZB_VER */
 	_LT7381_InitSPI();
 
     _TFT_LT7381_Init();
@@ -191,7 +189,6 @@ void BSP_TFT_LT7381_Reset(uint8_t sts)
 
 void BSP_TFT_LT7381_BL(uint8_t sts)
 {
-#if(CONFIG_MXRT105X_ZB_VER >= 3)
 	static bool isInit = false;
 	if(isInit == false) {
 		isInit = true;
@@ -203,11 +200,6 @@ void BSP_TFT_LT7381_BL(uint8_t sts)
 	} else {
 		Write_GPIO_C_7_0(0x00);
 	}
-#else
-	if(BSP_TCA9535_NOERROR != BSP_TCA9535_SetPinState(TCA9535_P10, sts)) {
-		printf("BSP_TFT_LT7381_BL: Error in BSP_TCA9535_SetPinState()\n");
-	}
-#endif /* CONFIG_MXRT105X_ZB_VER */
 }
 #if 0
 //*****************************************************************************
