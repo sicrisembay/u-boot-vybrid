@@ -11,11 +11,13 @@
 #include "fsl_gpio.h"
 #include "pin_mux.h"
 
+#if defined(CONFIG_MXRT105X_ZB_VER3)
 #define BOARD_LED_GPIO      GPIO2
 #define BOARD_LED_GPIO_PIN  31U
-
 #define BOARD_PWR_SW_GPIO       GPIO2
 #define BOARD_PWR_SW_GPIO_PIN   11U
+#endif
+
 /*******************************************************************************
  * Code
  ******************************************************************************/
@@ -31,6 +33,7 @@ uint32_t BOARD_ReadU32(uint32_t addr)
 }
 
 void BOARD_InitPins(void) {
+#if defined(CONFIG_MXRT105X_ZB_VER3)
 	gpio_pin_config_t led_config = {kGPIO_DigitalOutput, 0, kGPIO_NoIntmode};
 	gpio_pin_config_t outputHigh_config = {kGPIO_DigitalOutput, 1, kGPIO_NoIntmode};
     CLOCK_EnableClock(kCLOCK_Iomuxc);
@@ -71,116 +74,89 @@ void BOARD_InitPins(void) {
     /** Initialize USB IO ************************************************************************/
     IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_01_USB_OTG1_ID, 0U);
     IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_01_USB_OTG1_ID, 0xF8B0U);
-//    IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_03_USB_OTG1_OC, 0U);
-//    IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_03_USB_OTG1_OC, 0xB0B0U);
 #define USB_OTG1_PWR_GPIO		GPIO1
 #define USB_OTG1_PWR_GPIO_PIN   17U
     GPIO_PinInit(USB_OTG1_PWR_GPIO, USB_OTG1_PWR_GPIO_PIN, &outputHigh_config);
     IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_01_GPIO1_IO17, 0U);
     IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_01_GPIO1_IO17, 0xB8B0u);
 
-#if 0 /* Done in DCD */
-    /* Initialize SEMC IO used for SDRAM and NAND Flash */
-    // Config IOMUX for sdr
-    BOARD_WriteU32(0x401F8014,0x00000000); // EMC_00
-    BOARD_WriteU32(0x401F8018,0x00000000); // EMC_01
-    BOARD_WriteU32(0x401F801C,0x00000000); // EMC_02
-    BOARD_WriteU32(0x401F8020,0x00000000); // EMC_03
-    BOARD_WriteU32(0x401F8024,0x00000000); // EMC_04
-    BOARD_WriteU32(0x401F8028,0x00000000); // EMC_05
-    BOARD_WriteU32(0x401F802C,0x00000000); // EMC_06
-    BOARD_WriteU32(0x401F8030,0x00000000); // EMC_07
-    BOARD_WriteU32(0x401F8034,0x00000000); // EMC_08
-    BOARD_WriteU32(0x401F8038,0x00000000); // EMC_09
-    BOARD_WriteU32(0x401F803C,0x00000000); // EMC_10
-    BOARD_WriteU32(0x401F8040,0x00000000); // EMC_11
-    BOARD_WriteU32(0x401F8044,0x00000000); // EMC_12
-    BOARD_WriteU32(0x401F8048,0x00000000); // EMC_13
-    BOARD_WriteU32(0x401F804C,0x00000000); // EMC_14
-    BOARD_WriteU32(0x401F8050,0x00000000); // EMC_15
-    BOARD_WriteU32(0x401F8054,0x00000000); // EMC_16
-    BOARD_WriteU32(0x401F8058,0x00000000); // EMC_17
-    BOARD_WriteU32(0x401F805C,0x00000000); // EMC_18
-    BOARD_WriteU32(0x401F8060,0x00000000); // EMC_19
-    BOARD_WriteU32(0x401F8064,0x00000000); // EMC_20
-    BOARD_WriteU32(0x401F8068,0x00000000); // EMC_21
-    BOARD_WriteU32(0x401F806C,0x00000000); // EMC_22
-    BOARD_WriteU32(0x401F8070,0x00000000); // EMC_23
-    BOARD_WriteU32(0x401F8074,0x00000000); // EMC_24
-    BOARD_WriteU32(0x401F8078,0x00000000); // EMC_25
-    BOARD_WriteU32(0x401F807C,0x00000000); // EMC_26
-    BOARD_WriteU32(0x401F8080,0x00000000); // EMC_27
-    BOARD_WriteU32(0x401F8084,0x00000000); // EMC_28
-    BOARD_WriteU32(0x401F8088,0x00000000); // EMC_29
-    BOARD_WriteU32(0x401F808C,0x00000000); // EMC_30
-    BOARD_WriteU32(0x401F8090,0x00000000); // EMC_31
-    BOARD_WriteU32(0x401F8094,0x00000000); // EMC_32
-    BOARD_WriteU32(0x401F8098,0x00000000); // EMC_33
-    BOARD_WriteU32(0x401F809C,0x00000000); // EMC_34
-    BOARD_WriteU32(0x401F80A0,0x00000000); // EMC_35
-    BOARD_WriteU32(0x401F80A4,0x00000000); // EMC_36
-    BOARD_WriteU32(0x401F80A8,0x00000000); // EMC_37
-    BOARD_WriteU32(0x401F80AC,0x00000000); // EMC_38
-    BOARD_WriteU32(0x401F80B0,0x00000010); // EMC_39, DQS PIN, enable SION
-    BOARD_WriteU32(0x401F80B4,0x00000000); // EMC_40, RDY PIN
-    BOARD_WriteU32(0x401F80B8,0x00000000); // EMC_41, CSX0 Pin
+#elif defined(CONFIG_MXRT105X_ZB_VER4)
+    gpio_pin_config_t outputHigh_config = {kGPIO_DigitalOutput, 1, kGPIO_NoIntmode};
+    CLOCK_EnableClock(kCLOCK_Iomuxc);
 
-    // PAD ctrl
-    //drive strength = 0x7 to increase drive strength
-    //otherwise the data7 bit may fail.
-    //0x000000F1: the driver strength may not enough.
-    BOARD_WriteU32(0x401F8204,0x000110F9); // EMC_00
-    BOARD_WriteU32(0x401F8208,0x000110F9); // EMC_01
-    BOARD_WriteU32(0x401F820C,0x000110F9); // EMC_02
-    BOARD_WriteU32(0x401F8210,0x000110F9); // EMC_03
-    BOARD_WriteU32(0x401F8214,0x000110F9); // EMC_04
-    BOARD_WriteU32(0x401F8218,0x000110F9); // EMC_05
-    BOARD_WriteU32(0x401F821C,0x000110F9); // EMC_06
-    BOARD_WriteU32(0x401F8220,0x000110F9); // EMC_07
-    BOARD_WriteU32(0x401F8224,0x000110F9); // EMC_08
-    BOARD_WriteU32(0x401F8228,0x000110F9); // EMC_09
-    BOARD_WriteU32(0x401F822C,0x000110F9); // EMC_10
-    BOARD_WriteU32(0x401F8230,0x000110F9); // EMC_11
-    BOARD_WriteU32(0x401F8234,0x000110F9); // EMC_12
-    BOARD_WriteU32(0x401F8238,0x000110F9); // EMC_13
-    BOARD_WriteU32(0x401F823C,0x000110F9); // EMC_14
-    BOARD_WriteU32(0x401F8240,0x000110F9); // EMC_15
-    BOARD_WriteU32(0x401F8244,0x000110F9); // EMC_16
-    BOARD_WriteU32(0x401F8248,0x000110F9); // EMC_17
-    BOARD_WriteU32(0x401F824C,0x000110F9); // EMC_18
-    BOARD_WriteU32(0x401F8250,0x000110F9); // EMC_19
-    BOARD_WriteU32(0x401F8254,0x000110F9); // EMC_20
-    BOARD_WriteU32(0x401F8258,0x000110F9); // EMC_21
-    BOARD_WriteU32(0x401F825C,0x000110F9); // EMC_22
-    BOARD_WriteU32(0x401F8260,0x000110F9); // EMC_23
-    BOARD_WriteU32(0x401F8264,0x000110F9); // EMC_24
-    BOARD_WriteU32(0x401F8268,0x000110F9); // EMC_25
-    BOARD_WriteU32(0x401F826C,0x000110F9); // EMC_26
-    BOARD_WriteU32(0x401F8270,0x000110F9); // EMC_27
-    BOARD_WriteU32(0x401F8274,0x000110F9); // EMC_28
-    BOARD_WriteU32(0x401F8278,0x000110F9); // EMC_29
-    BOARD_WriteU32(0x401F827C,0x000110F9); // EMC_30
-    BOARD_WriteU32(0x401F8280,0x000110F9); // EMC_31
-    BOARD_WriteU32(0x401F8284,0x000110F9); // EMC_32
-    BOARD_WriteU32(0x401F8288,0x000110F9); // EMC_33
-    BOARD_WriteU32(0x401F828C,0x000110F9); // EMC_34
-    BOARD_WriteU32(0x401F8290,0x000110F9); // EMC_35
-    BOARD_WriteU32(0x401F8294,0x000110F9); // EMC_36
-    BOARD_WriteU32(0x401F8298,0x000110F9); // EMC_37
-    BOARD_WriteU32(0x401F829C,0x000110F9); // EMC_38
-    BOARD_WriteU32(0x401F82A0,0x000110F9); // EMC_39, DQS Pin
-    BOARD_WriteU32(0x401F82A4,0x0000F8F9); // EMC_40, RDY Pin
-    BOARD_WriteU32(0x401F82A8,0x000110F9); // EMC_41, CSX0 Pin
-#endif // #if 0 /* Done in DCD */
+    /** Initialize Pins for ESP32 EN and Boot ****************************************************/
+    GPIO_PinInit(GPIO3, 7U, &outputHigh_config);
+    GPIO_PinInit(GPIO3, 8U, &outputHigh_config);
+    IOMUXC_SetPinMux(
+        IOMUXC_GPIO_SD_B1_07_GPIO3_IO07,        /* GPIO_SD_B1_07 is configured as GPIO3_IO07 */
+        0U);                                    /* Software Input On Field: Input Path is determined by functionality */
+    IOMUXC_SetPinMux(
+        IOMUXC_GPIO_SD_B1_08_GPIO3_IO08,        /* GPIO_SD_B1_08 is configured as GPIO3_IO08 */
+        0U);                                    /* Software Input On Field: Input Path is determined by functionality */
+    IOMUXC_SetPinConfig(
+        IOMUXC_GPIO_SD_B1_07_GPIO3_IO07,        /* GPIO_SD_B1_07 PAD functional properties : */
+        0xA8B0U);                               /* Slew Rate Field: Slow Slew Rate
+                                                   Drive Strength Field: R0/6
+                                                   Speed Field: medium(100MHz)
+                                                   Open Drain Enable Field: Open Drain Enabled
+                                                   Pull / Keep Enable Field: Pull/Keeper Disabled
+                                                   Pull / Keep Select Field: Pull
+                                                   Pull Up / Down Config. Field: 100K Ohm Pull Up
+                                                   Hyst. Enable Field: Hysteresis Disabled */
+    IOMUXC_SetPinConfig(
+        IOMUXC_GPIO_SD_B1_08_GPIO3_IO08,        /* GPIO_SD_B1_08 PAD functional properties : */
+        0xA8B0U);                               /* Slew Rate Field: Slow Slew Rate
+                                                   Drive Strength Field: R0/6
+                                                   Speed Field: medium(100MHz)
+                                                   Open Drain Enable Field: Open Drain Enabled
+                                                   Pull / Keep Enable Field: Pull/Keeper Disabled
+                                                   Pull / Keep Select Field: Pull
+                                                   Pull Up / Down Config. Field: 100K Ohm Pull Up
+                                                   Hyst. Enable Field: Hysteresis Disabled */
+
+    /** Initialize UART IO ***********************************************************************/
+	IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_12_LPUART1_TX,        /* GPIO_AD_B0_12 is configured as LPUART1_TX */
+					 0U);                                    /* Software Input On Field: Input Path is determined by functionality */
+	IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_13_LPUART1_RX,        /* GPIO_AD_B0_13 is configured as LPUART1_RX */
+					 0U);                                    /* Software Input On Field: Input Path is determined by functionality */
+	IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_12_LPUART1_TX,        /* GPIO_AD_B0_12 PAD functional properties : */
+					 0x10B0u);                               /* Slew Rate Field: Slow Slew Rate
+												 Drive Strength Field: R0/6
+												 Speed Field: medium(100MHz)
+												 Open Drain Enable Field: Open Drain Disabled
+												 Pull / Keep Enable Field: Pull/Keeper Enabled
+												 Pull / Keep Select Field: Keeper
+												 Pull Up / Down Config. Field: 100K Ohm Pull Down
+												 Hyst. Enable Field: Hysteresis Disabled */
+	IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_13_LPUART1_RX,        /* GPIO_AD_B0_13 PAD functional properties : */
+					 0x10B0u);                               /* Slew Rate Field: Slow Slew Rate
+												 Drive Strength Field: R0/6
+												 Speed Field: medium(100MHz)
+												 Open Drain Enable Field: Open Drain Disabled
+												 Pull / Keep Enable Field: Pull/Keeper Enabled
+												 Pull / Keep Select Field: Keeper
+												 Pull Up / Down Config. Field: 100K Ohm Pull Down
+												 Hyst. Enable Field: Hysteresis Disabled */
+    /** Initialize USB IO ************************************************************************/
+    IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_01_USB_OTG1_ID, 0U);
+    IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_01_USB_OTG1_ID, 0xF8B0U);
+#define USB_OTG1_PWR_GPIO		GPIO1
+#define USB_OTG1_PWR_GPIO_PIN   17U
+    GPIO_PinInit(USB_OTG1_PWR_GPIO, USB_OTG1_PWR_GPIO_PIN, &outputHigh_config);
+    IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_01_GPIO1_IO17, 0U);
+    IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_01_GPIO1_IO17, 0xB8B0u);
+#endif
 }
 
 void BOARD_SetLedState(uint8_t state)
 {
+#if defined(CONFIG_MXRT105X_ZB_VER3)
 	if(state != 0) {
 		GPIO_WritePinOutput(BOARD_LED_GPIO, BOARD_LED_GPIO_PIN, 1U);
 	} else {
 		GPIO_WritePinOutput(BOARD_LED_GPIO, BOARD_LED_GPIO_PIN, 0U);
 	}
+#endif
 }
 
 /*******************************************************************************

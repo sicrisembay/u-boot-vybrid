@@ -9,5 +9,6 @@
 
 #include "../../../../board/freescale/mxrt105x-zb/devices/MIMXRT1052/MIMXRT1052.h"
 #include "../../../../board/freescale/mxrt105x-zb/devices/MIMXRT1052/drivers/fsl_clock.h"
+#include "asm/mach-imx/regs-lcdif.h"
 
 #endif

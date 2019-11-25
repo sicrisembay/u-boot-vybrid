@@ -41,10 +41,10 @@ obj-y	:= mxrt105x-zb.o	\
 	./boards/zb/fsl_sdram.o	\
 	./boards/zb/fsl_nand.o \
 	./boards/zb/fsl_usb_ehci.o \
-	./boards/evkmimrt1050/demo_apps/fat_tool/fsl_phy.o
+	./boards/evkmimrt1050/demo_apps/fat_tool/fsl_phy.o \
+	./devices/MIMXRT1052/drivers/fsl_elcdif.o
 
 #	./devices/MIMXRT1052/drivers/fsl_common.o	\
-	./devices/MIMXRT1052/drivers/fsl_elcdif.o	\
 	./devices/MIMXRT1052/drivers/fsl_sai.o	\
 	./devices/MIMXRT1052/drivers/fsl_wdog.o	\
 	./devices/MIMXRT1052/drivers/fsl_flexspi.o	\
@@ -56,3 +56,4 @@ obj-y	:= mxrt105x-zb.o	\
 	./devices/MIMXRT1052/drivers/fsl_edma.o	\
 	
 obj-$(CONFIG_MXRT105X_ZB_DISP_LT7381) += boards/zb/lt7381/
+obj-$(CONFIG_MXRT105X_ZB_DISP_8RGB) += boards/zb/serialRGB/

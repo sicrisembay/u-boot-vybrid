@@ -34,10 +34,25 @@ config MXRT105X_ZB_DISP_LT7381
     default y
     depends on MXRT105X_ZB_VER3
 
-config MXRT105X_ZB_DISP_FRIDA
-    bool "Frida LCD"
+if MXRT105X_ZB_VER4
+config MXRT105X_ZB_DISP_8RGB
+    bool "8-bit Serial RGB Display"
     default y
-    depends on MXRT105X_ZB_VER4
+config MXRT105X_ZB_DISP_WIDTH
+    int "Display Width"
+    default 320
+config MXRT105X_ZB_DISP_HEIGHT
+    int "Display Height"
+    default 240
+config MXRT105X_ZB_DISP_BUFFER_CNT
+    int "Number of framebuffer"
+    range 1 2
+    default 2
+config MXRT105X_ZB_DISP_STM8_DAUGHTER
+    bool "Use LCD adapter (STM8 daughter board)"
+    default y
+    depends on MXRT105X_ZB_DISP_8RGB
+endif
     
 endmenu
 
