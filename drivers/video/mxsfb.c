@@ -169,13 +169,24 @@ void lcdif_power_down(void)
 
 void *video_hw_init(void)
 {
+#if defined(CONFIG_MXRT105X_ZB_DISP_8RGB)
+	/* fill in Graphic Device */
+	panel.frameAdrs = CONFIG_FB_ADDR;
+	panel.winSizeX = CONFIG_MXRT105X_ZB_DISP_WIDTH;
+	panel.winSizeY = CONFIG_MXRT105X_ZB_DISP_HEIGHT;
+	panel.plnSizeX = CONFIG_MXRT105X_ZB_DISP_WIDTH;
+	panel.plnSizeY = CONFIG_MXRT105X_ZB_DISP_HEIGHT;
+	panel.gdfBytesPP = 4;
+	panel.gdfIndex = GDF_32BIT_X888RGB;
+	panel.memSize = panel.winSizeX * panel.winSizeY * panel.gdfBytesPP;
+	memset((void *)panel.frameAdrs, 0, panel.memSize);
+#else
 	int bpp = -1;
 	char *penv;
 	void *fb;
 	struct ctfb_res_modes mode;
 
 	puts("Video: ");
-
 	/* Suck display configuration from "videomode" variable */
 	penv = getenv("videomode");
 	if (!penv) {
@@ -237,7 +248,6 @@ void *video_hw_init(void)
 	/* Start framebuffer */
 	mxs_lcd_init(&panel, &mode, bpp);
 
-#ifdef CONFIG_VIDEO_MXS_MODE_SYSTEM
 	/*
 	 * If the LCD runs in system mode, the LCD refresh has to be triggered
 	 * manually by setting the RUN bit in HW_LCDIF_CTRL register. To avoid
@@ -259,6 +269,5 @@ void *video_hw_init(void)
 	/* Execute the DMA chain. */
 	mxs_dma_circ_start(MXS_DMA_CHANNEL_AHB_APBH_LCDIF, &desc);
 #endif
-
 	return (void *)&panel;
 }

@@ -32,6 +32,7 @@ DECLARE_GLOBAL_DATA_PTR;
 
 void BOARD_BootClockRUN(void);
 void BOARD_InitPins(void);
+static void setup_lcd(void);
 
 static void mxrt105x_zb_usb_init(void)
 {
@@ -56,6 +57,10 @@ int board_early_init_f(void)
 	CLOCK_EnableClock(kCLOCK_Lpuart1);
 
 	mxrt105x_zb_usb_init();
+
+#if defined(CONFIG_MXRT105X_ZB_DISP_8RGB)
+	setup_lcd();
+#endif
 
 	return 0;
 }
@@ -121,6 +126,7 @@ u32 imx_get_fecclk(void)
 static void setup_lcd(void)
 {
 #if defined(CONFIG_MXRT105X_ZB_DISP_8RGB)
+	gd->fb_base = CONFIG_FB_ADDR;
 	serialRGB_init();
 #endif
 }
@@ -157,8 +163,6 @@ int board_init(void)
 #if defined(CONFIG_MXRT105X_ZB_DISP_LT7381)
 	printf("Show Splash\n");
 	BSP_TFT_LT7381_Init();
-#elif defined(CONFIG_MXRT105X_ZB_DISP_8RGB)
-	setup_lcd();
 #endif
 	return 0;
 }

@@ -67,6 +67,7 @@
 
 /* LCD */
 #ifdef CONFIG_VIDEO
+#define CONFIG_SYS_MEM_TOP_HIDE DMAMEM_SZ_ALL  /* Reserved for Framebuffer */
 #define CONFIG_FB_ADDR			DMAMEM_BASE
 #define MXS_LCDIF_BASE			0x402B8000
 #define CONFIG_VIDEO_MXS
@@ -113,11 +114,13 @@
 
 
 #define CONFIG_BOOTCOMMAND						\
-	"run bootcond"
+	"run bootDebug"
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"ubootFirstRun=true\0" \
+	"showDebugLCD=true\0" \
 	"initUbiVol=echo ===== mount rootfs partition =====;" \
+	            "mtdparts default;" \
 	            "ubi part rootfs;" \
 	            "echo ===== creating ubi volumes =====;" \
 	            "if ubi check config1;" \
@@ -135,6 +138,10 @@
 	            "setenv ubootFirstRun false;" \
 				"saveenv\0" \
 	"bootfile=zpl_script.img\0" \
+	"bootDebug=if \${showDebugLCD};" \
+	           "then setenv stdout vga;" \
+	           "fi;" \
+	           "run bootcond;\0" \
 	"bootcond=if \${ubootFirstRun};" \
 	          "then echo ===== u-boot first run =====;" \
 	               "env default -a;" \
