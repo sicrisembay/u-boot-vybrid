@@ -36,9 +36,9 @@ void BOARD_InitPins(void) {
     CLOCK_EnableClock(kCLOCK_Iomuxc);
 
     /********************* Initialize LED IO *****************************************************/
-    IOMUXC_SetPinMux(IOMUXC_GPIO_B1_15_GPIO2_IO31, 0U);
-    IOMUXC_SetPinConfig(IOMUXC_GPIO_B1_15_GPIO2_IO31, 0x10B0u);
-    GPIO_PinInit(BOARD_LED_GPIO, BOARD_LED_GPIO_PIN, &led_config);
+//    IOMUXC_SetPinMux(IOMUXC_GPIO_B1_15_GPIO2_IO31, 0U);
+//    IOMUXC_SetPinConfig(IOMUXC_GPIO_B1_15_GPIO2_IO31, 0x10B0u);
+//    GPIO_PinInit(BOARD_LED_GPIO, BOARD_LED_GPIO_PIN, &led_config);
 
     /** Initialize UART IO ***********************************************************************/
     IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_12_LPUART1_TX,        /* GPIO_AD_B0_12 is configured as LPUART1_TX */
@@ -64,9 +64,39 @@ void BOARD_InitPins(void) {
                                                  Pull Up / Down Config. Field: 100K Ohm Pull Down
                                                  Hyst. Enable Field: Hysteresis Disabled */
     /** Enable Board Voltage Supply **************************************************************/
-    GPIO_PinInit(BOARD_PWR_SW_GPIO, BOARD_PWR_SW_GPIO_PIN, &outputHigh_config);
-    IOMUXC_SetPinMux(IOMUXC_GPIO_B0_11_GPIO2_IO11, 0U);
-    IOMUXC_SetPinConfig(IOMUXC_GPIO_B0_11_GPIO2_IO11, 0xB0U);
+//    GPIO_PinInit(BOARD_PWR_SW_GPIO, BOARD_PWR_SW_GPIO_PIN, &outputHigh_config);
+//    IOMUXC_SetPinMux(IOMUXC_GPIO_B0_11_GPIO2_IO11, 0U);
+//    IOMUXC_SetPinConfig(IOMUXC_GPIO_B0_11_GPIO2_IO11, 0xB0U);
+
+    /** Initialize Pins for ESP32 EN and Boot ****************************************************/
+    GPIO_PinInit(GPIO3, 7U, &outputHigh_config);
+    GPIO_PinInit(GPIO3, 8U, &outputHigh_config);
+    IOMUXC_SetPinMux(
+        IOMUXC_GPIO_SD_B1_07_GPIO3_IO07,        /* GPIO_SD_B1_07 is configured as GPIO3_IO07 */
+        0U);                                    /* Software Input On Field: Input Path is determined by functionality */
+    IOMUXC_SetPinMux(
+        IOMUXC_GPIO_SD_B1_08_GPIO3_IO08,        /* GPIO_SD_B1_08 is configured as GPIO3_IO08 */
+        0U);                                    /* Software Input On Field: Input Path is determined by functionality */
+    IOMUXC_SetPinConfig(
+        IOMUXC_GPIO_SD_B1_07_GPIO3_IO07,        /* GPIO_SD_B1_07 PAD functional properties : */
+        0xA8B0U);                               /* Slew Rate Field: Slow Slew Rate
+                                                   Drive Strength Field: R0/6
+                                                   Speed Field: medium(100MHz)
+                                                   Open Drain Enable Field: Open Drain Enabled
+                                                   Pull / Keep Enable Field: Pull/Keeper Disabled
+                                                   Pull / Keep Select Field: Pull
+                                                   Pull Up / Down Config. Field: 100K Ohm Pull Up
+                                                   Hyst. Enable Field: Hysteresis Disabled */
+    IOMUXC_SetPinConfig(
+        IOMUXC_GPIO_SD_B1_08_GPIO3_IO08,        /* GPIO_SD_B1_08 PAD functional properties : */
+        0xA8B0U);                               /* Slew Rate Field: Slow Slew Rate
+                                                   Drive Strength Field: R0/6
+                                                   Speed Field: medium(100MHz)
+                                                   Open Drain Enable Field: Open Drain Enabled
+                                                   Pull / Keep Enable Field: Pull/Keeper Disabled
+                                                   Pull / Keep Select Field: Pull
+                                                   Pull Up / Down Config. Field: 100K Ohm Pull Up
+                                                   Hyst. Enable Field: Hysteresis Disabled */
 
     /** Initialize USB IO ************************************************************************/
     IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_01_USB_OTG1_ID, 0U);
