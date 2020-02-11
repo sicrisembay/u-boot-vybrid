@@ -12,6 +12,7 @@
 #include "fsl_clock.h"
 #include "fsl_elcdif.h"
 #include "serialRGB.h"
+#include "splash.h"
 
 #define COLOR_BLACK						(0x00000000)
 #define COLOR_RED						(0x00FF0000)
@@ -118,12 +119,16 @@ void serialRGB_init(void)
 	/* Clear frame buffer */
 	pFrame = (uint32_t *)CONFIG_FB_ADDR;
 	for(i = 0; i < (CONFIG_MXRT105X_ZB_DISP_HEIGHT * CONFIG_MXRT105X_ZB_DISP_WIDTH * CONFIG_MXRT105X_ZB_DISP_BUFFER_CNT); i++) {
-		pFrame[i] = COLOR_RED;
+		pFrame[i] = COLOR_BLACK;
 	}
 
 	ELCDIF_RgbModeStart(LCDIF);
 }
 
+void serialRGB_splash(void)
+{
+	bmp_display((ulong)(&splash[0]), 110, 70);
+}
 
 /*******************************************************************************
  * EOF

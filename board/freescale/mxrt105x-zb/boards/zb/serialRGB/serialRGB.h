@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 void serialRGB_init(void);
+void serialRGB_splash(void);
 
 #if defined(__cplusplus)
 }

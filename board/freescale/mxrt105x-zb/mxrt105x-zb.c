@@ -169,7 +169,8 @@ int board_init(void)
 
 int board_late_init(void)
 {
-//	board_eth_init(NULL);
+	printf("Show Splash\n");
+	serialRGB_splash();
 	return 0;
 }
 
